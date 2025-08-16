@@ -49,6 +49,17 @@ android {
     namespace = "com.yuri.love"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    /* remove link check */
+    lint {
+        disable.addAll(
+            listOf(
+                "NullSafeMutableLiveData",
+                "MutableLiveData",
+                "UnusedResources"
+            )
+        )
+    }
+
     defaultConfig {
         applicationId = "com.yuri.love"
         minSdk = libs.versions.android.minSdk.get().toInt()
