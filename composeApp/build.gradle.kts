@@ -11,6 +11,15 @@ plugins {
 }
 
 kotlin {
+    targets.configureEach {
+        compilations.configureEach {
+            compileTaskProvider.get().compilerOptions {
+                /* disable actual-classes error */
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
+        }
+    }
+
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
@@ -26,6 +35,16 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
+            /* kotlinx datetime */
+            implementation(libs.kotlinx.datetime)
+
+            /* logger */
+            implementation(libs.kotlin.logging)
+
+            /* voyager navigator */
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.koin)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -39,6 +58,9 @@ kotlin {
             implementation(libs.kotlin.test)
         }
         jvmMain.dependencies {
+            /* logback logger */
+            implementation(libs.ch.logback.classic)
+
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
         }
@@ -70,6 +92,10 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            // 排除冲突的元数据文件
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/*.kotlin_module"
+            excludes += "META-INF/versions/*"
         }
     }
     buildTypes {
