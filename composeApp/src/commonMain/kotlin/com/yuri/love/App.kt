@@ -13,37 +13,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.navigator.Navigator
+import com.yuri.love.views.HomeScreen
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.compose_multiplatform
+import journal.composeapp.generated.resources.more
+
+expect object Static {
+    fun init()
+}
 
 @Composable
 @Preview
 fun App() {
+    Static.init()
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
-        }
+        Navigator(HomeScreen())
     }
 }
