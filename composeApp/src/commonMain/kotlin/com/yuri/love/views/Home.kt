@@ -1,13 +1,7 @@
 package com.yuri.love.views
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
@@ -15,75 +9,59 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import journal.composeapp.generated.resources.MapleMono_NF_CN_Medium
 import journal.composeapp.generated.resources.Res
+import journal.composeapp.generated.resources.date
 import journal.composeapp.generated.resources.kiss
 import journal.composeapp.generated.resources.more
+import journal.composeapp.generated.resources.weather_sun
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.datetime.Month
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@Composable
+fun Modifier.platformSafeTopPadding(): Modifier {
+    if (!LocalInspectionMode.current) {
+        this.statusBarsPadding()
+    }
+    return this
+}
 
-//val MapleMonoFont = FontFamily(
-//    Font(Res.font.MapleMono_NF_CN_Medium)
-//)
+val MapleMonoFont: FontFamily
+    @Composable
+    get() = if (LocalInspectionMode.current) {
+        FontFamily.Default
+    } else {
+        FontFamily(Font(Res.font.MapleMono_NF_CN_Medium))
+    }
 
 // 定义 Screen
 class HomeScreen : Screen {
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
         CreateHome()
     }
 }
@@ -102,12 +80,11 @@ val softPinkGradient = Brush.linearGradient(
 @Preview
 @Composable
 private fun CreateHome() {
-    val log = logger {}
-
     Column(modifier = Modifier
         .fillMaxSize()
         .background(softPinkGradient)
-        .padding(top = 35.dp, start = 10.dp, end = 10.dp)
+        .padding(top = 0.dp, start = 10.dp, end = 10.dp)
+        .platformSafeTopPadding()
     ) {
         TapBar()
         DiaryHeaderAdvanced()
@@ -123,30 +100,71 @@ fun JournalCardComposable() {
         ,
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF10B981)
+            containerColor = Color.White
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
     ) {
-        Column(modifier = Modifier.padding(all = 8.dp)) {
+        Column(modifier = Modifier.padding(all = 12.dp)) {
             Box(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    modifier = Modifier.align(Alignment.CenterStart),
+                    modifier = Modifier.align(Alignment.CenterStart).padding(bottom = 5.dp),
                     text = "美好的一天",
                     fontWeight = FontWeight.Medium,
                     fontSize = 20.sp,
-//                    fontFamily = FontFamily(
-//                        Font(Res.font.MapleMono_NF_CN_Medium)
-//                    )
+                    fontFamily = MapleMonoFont
                 )
-                Canvas(modifier = Modifier.size(16.dp).align(Alignment.CenterEnd)) {
+                Canvas(modifier = Modifier.size(12.dp).align(Alignment.CenterEnd)) {
                     drawCircle(
-                        color = Color.Gray,
-                        radius = size.minDimension / 2,
+                        color = Color(0xFFF472B6),
                         style = Fill
                     )
                 }
             }
-            Text("yuri")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painterResource(Res.drawable.date),
+                    null,
+                    modifier = Modifier.size(18.dp),
+                )
+                Text("2024年8月14日", modifier = Modifier.padding(start = 8.dp, end = 12.dp), fontFamily = MapleMonoFont)
+                Image(
+                    painterResource(Res.drawable.weather_sun),
+                    null,
+                    modifier = Modifier.size(18.dp),
+                )
+                Text("晴天", modifier = Modifier.padding(start = 8.dp), fontFamily = MapleMonoFont)
+            }
+            Row(
+                modifier = Modifier.padding(top = 5.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically  // 垂直居中
+            ) {
+                // 标签 1
+                Text(
+                    text = "#生活",
+                    style = TextStyle(
+                        color = Color(0xFF9E3B46),  // text-pink-800
+                        fontSize = 13.sp,  // text-xs
+                        fontWeight = FontWeight.Medium
+                    ),
+                    modifier = Modifier
+                        .background(Color(0xFFFEC7D7), shape = CircleShape)  // bg-pink-100 + rounded-full
+                        .padding(horizontal = 12.dp, vertical = 3.dp)  // 内外边距
+                )
+
+                // 标签 2
+                Text(
+                    text = "#心情",
+                    style = TextStyle(
+                        color = Color(0xFF9B2D20),  // text-pink-800
+                        fontSize = 13.sp,  // text-xs
+                        fontWeight = FontWeight.Medium
+                    ),
+                    modifier = Modifier
+                        .background(Color(0xFFFEC7D7), shape = CircleShape)  // bg-pink-100 + rounded-full
+                        .padding(horizontal = 12.dp, vertical = 3.dp)  // 内外边距
+                )
+            }
         }
     }
 }
@@ -184,9 +202,7 @@ fun DiaryHeaderAdvanced() {
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1F2937),
-                    fontFamily = FontFamily(
-                        Font(Res.font.MapleMono_NF_CN_Medium)
-                    )
+                    fontFamily = MapleMonoFont
                 ),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -207,9 +223,7 @@ fun DiaryHeaderAdvanced() {
                     style = MaterialTheme.typography.bodyLarge.copy(
                         color = Color(0xFF4B5563)
                     ),
-                    fontFamily = FontFamily(
-                        Font(Res.font.MapleMono_NF_CN_Medium)
-                    )
+                    fontFamily = MapleMonoFont
                 )
             }
         }
