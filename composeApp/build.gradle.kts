@@ -45,6 +45,12 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.koin)
 
+            // Material Icons - 核心图标包
+            implementation(libs.androidx.material3)
+            implementation(libs.androidx.material.icons.core)
+            // Material Icons - 扩展图标包 (包含更多图标)
+            implementation(libs.androidx.material.icons.extended)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
