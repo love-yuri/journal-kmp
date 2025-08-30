@@ -8,15 +8,11 @@ import androidx.compose.ui.graphics.Color
 object GlobalColors {
 
     // 渐变背景色
-    val softPinkGradient = Brush.linearGradient(
+    val softPinkGradient = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFFFCE7F3), // 浅粉色
-            Color(0xFFFEFBFF), // 极淡的粉白色
-            Color(0xFFFFFFFF), // 纯白色
-            Color(0xFFFFF0F3)  // 极淡的玫瑰白
-        ),
-        start = Offset.Zero,
-        end = Offset.Infinite
+            Color(0xFFFDF2F8), // 粉嫩白
+            Color(0xFFFCE7F3)  // 樱花粉白
+        )
     )
 
     // 顶栏背景色
