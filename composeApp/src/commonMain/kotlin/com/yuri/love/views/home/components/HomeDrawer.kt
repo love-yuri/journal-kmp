@@ -1,32 +1,33 @@
 package com.yuri.love.views.home.components
 
+import SakuraAnimation
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.yuri.love.styles.GlobalFonts
+import journal.composeapp.generated.resources.Res
+import journal.composeapp.generated.resources.avatar
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.random.Random
+import org.jetbrains.compose.resources.painterResource
 
 data class EnhancedDrawerMenuItem(
     val title: String,
@@ -43,23 +44,21 @@ fun LovelyEnhancedDrawer(onCloseDrawer: () -> Unit = {}) {
     val drawerItems = listOf(
         EnhancedDrawerMenuItem("Home", Icons.Outlined.Home, Icons.Filled.Home, true),
         EnhancedDrawerMenuItem("Discover", Icons.Outlined.Explore, Icons.Filled.Explore, hasNewContent = true),
-        EnhancedDrawerMenuItem("Messages", Icons.Outlined.ChatBubbleOutline, Icons.Filled.ChatBubble, badge = 8),
         EnhancedDrawerMenuItem("Matches", Icons.Outlined.Favorite, Icons.Filled.Favorite, badge = 3),
         EnhancedDrawerMenuItem("Profile", Icons.Outlined.Person, Icons.Filled.Person),
-        EnhancedDrawerMenuItem("Premium", Icons.Outlined.Diamond, Icons.Filled.Diamond, hasNewContent = true),
         EnhancedDrawerMenuItem("Settings", Icons.Outlined.Settings, Icons.Filled.Settings)
     )
 
     Box(
         modifier = Modifier
             .fillMaxHeight()
-            .width(320.dp)
+            .width(380.dp)
     ) {
         // 梦幻背景
         EnhancedBackground()
 
-        // 浮动心形装饰
-        FloatingHearts()
+        // 樱花特效
+        SakuraAnimation()
 
         // 主要内容
         Column(
@@ -68,8 +67,6 @@ fun LovelyEnhancedDrawer(onCloseDrawer: () -> Unit = {}) {
                 .padding(24.dp)
         ) {
             EnhancedDrawerHeader()
-
-            Spacer(Modifier.height(32.dp))
 
             // 导航菜单
             LazyColumn(
@@ -133,12 +130,11 @@ private fun EnhancedBackground() {
             ),
             label = "rotation"
         )
-
         Box(
             modifier = Modifier
+                .rotate(rotation)
                 .size(300.dp)
                 .offset((-80).dp, 50.dp)
-                .rotate(rotation)
                 .background(
                     Brush.radialGradient(
                         listOf(
@@ -233,26 +229,16 @@ private fun EnhancedDrawerHeader() {
                             ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            "Y",
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
+                        Image(
+                            painter = painterResource(Res.drawable.avatar),
+                            null,
+                            modifier = Modifier.fillMaxSize()
+                                .clip(CircleShape)
+                                .scale(1.5f),
                         )
                     }
                 }
-
-                // 在线状态指示器
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .align(Alignment.BottomEnd)
-                        .offset((-2).dp, (-2).dp)
-                        .background(Color.White, CircleShape)
-                        .padding(2.dp)
-                        .background(Color(0xFF34C759), CircleShape)
-                )
-
+                
                 // 心形装饰
                 Box(
                     modifier = Modifier
@@ -268,40 +254,21 @@ private fun EnhancedDrawerHeader() {
             Spacer(Modifier.height(16.dp))
 
             Text(
-                "Yuri Love",
+                "Love Yuri",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF2D1B35)
             )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Icon(
-                    Icons.Filled.Diamond,
-                    contentDescription = null,
-                    tint = Color(0xFFFFD700),
-                    modifier = Modifier.size(14.dp)
-                )
-                Text(
-                    "Premium Member",
-                    fontSize = 13.sp,
-                    color = Color(0xFF8B5A96),
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Spacer(Modifier.height(12.dp))
 
             // 统计卡片
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                StatCard("Matches", "128", Modifier.weight(1f))
-                StatCard("Likes", "1.2K", Modifier.weight(1f))
-                StatCard("Views", "5.6K", Modifier.weight(1f))
+                val modifier = Modifier.weight(1f)
+                StatCard("总文章", "128", modifier)
+                StatCard("总字数", "1.2K", modifier)
+                StatCard("总时间", "2年", modifier)
             }
         }
     }
@@ -326,8 +293,9 @@ private fun StatCard(label: String, value: String, modifier: Modifier = Modifier
         )
         Text(
             label,
-            fontSize = 11.sp,
-            color = Color(0xFF8B5A96)
+            fontSize = 12.sp,
+            color = Color(0xFF8B5A96),
+            fontFamily = GlobalFonts.MapleMonoFont
         )
     }
 }
@@ -338,8 +306,6 @@ private fun EnhancedDrawerItem(
     index: Int,
     onClick: () -> Unit
 ) {
-    var isPressed by remember { mutableStateOf(false) }
-
     // 进入动画
     val animatedVisibility = remember { Animatable(0f) }
 
@@ -355,7 +321,7 @@ private fun EnhancedDrawerItem(
     }
 
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.96f else 1f,
+        targetValue = 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "scale"
     )
@@ -368,23 +334,13 @@ private fun EnhancedDrawerItem(
             .alpha(animatedVisibility.value),
         color = when {
             item.isSelected -> Color(0x25FF6B9D)
-            isPressed -> Color(0x15FF6B9D)
             else -> Color.Transparent
         },
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 14.dp)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            isPressed = true
-                            tryAwaitRelease()
-                            isPressed = false
-                        }
-                    )
-                },
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 图标容器
@@ -440,21 +396,10 @@ private fun EnhancedDrawerItem(
                     fontWeight = if (item.isSelected) FontWeight.Bold else FontWeight.SemiBold,
                     color = if (item.isSelected) Color(0xFF2D1B35) else Color(0xFF4A5568)
                 )
-
-                if (item.title == "Premium") {
-                    Text(
-                        "Unlock exclusive features",
-                        fontSize = 12.sp,
-                        color = Color(0xFF8B5A96)
-                    )
-                }
             }
 
             // 右侧指示器
             when {
-                item.badge != null && item.badge > 0 -> {
-                    Badge(item.badge)
-                }
                 item.isSelected -> {
                     Box(
                         modifier = Modifier
@@ -464,7 +409,7 @@ private fun EnhancedDrawerItem(
                 }
                 else -> {
                     Icon(
-                        Icons.Rounded.KeyboardArrowRight,
+                        Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                         contentDescription = null,
                         tint = Color(0xFFB0B7C3),
                         modifier = Modifier.size(18.dp)
@@ -472,43 +417,6 @@ private fun EnhancedDrawerItem(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun Badge(count: Int) {
-    val infiniteTransition = rememberInfiniteTransition(label = "badge")
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "badgeScale"
-    )
-
-    Box(
-        modifier = Modifier
-            .scale(scale)
-            .background(
-                Brush.linearGradient(
-                    listOf(
-                        Color(0xFFFF4757),
-                        Color(0xFFFF3742)
-                    )
-                ),
-                CircleShape
-            )
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = if (count > 99) "99+" else count.toString(),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
     }
 }
 
@@ -533,76 +441,13 @@ private fun EnhancedDrawerFooter() {
 
         Spacer(Modifier.height(20.dp))
 
-        // 快捷操作
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            QuickActionButton(
-                icon = Icons.Filled.Palette,
-                label = "Theme",
-                onClick = { }
-            )
-
-            QuickActionButton(
-                icon = Icons.Filled.Help,
-                label = "Help",
-                onClick = { }
-            )
-
-            QuickActionButton(
-                icon = Icons.Filled.Logout,
-                label = "Logout",
-                onClick = { }
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
         // 版本信息
         Text(
-            text = "Lovely Hearts v2.5.0",
+            text = "心情日记 v1.0.0",
             fontSize = 12.sp,
             color = Color(0xFF8B5A96),
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
-@Composable
-private fun QuickActionButton(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .background(
-                    Color(0x15FF6B9D),
-                    CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                icon,
-                contentDescription = label,
-                tint = Color(0xFF8B5A96),
-                modifier = Modifier.size(18.dp)
-            )
-        }
-
-        Spacer(Modifier.height(4.dp))
-
-        Text(
-            label,
-            fontSize = 10.sp,
-            color = Color(0xFF8B5A96)
         )
     }
 }
