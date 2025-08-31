@@ -1,6 +1,5 @@
 package com.yuri.love.views.home.components
 
-import SakuraAnimation
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -25,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import com.yuri.love.styles.GlobalFonts
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.avatar
-import kotlinx.coroutines.delay
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.painterResource
 
@@ -299,102 +297,57 @@ private fun StatCard(label: String, value: String, modifier: Modifier = Modifier
         )
     }
 }
-
 @Composable
 private fun EnhancedDrawerItem(
     item: EnhancedDrawerMenuItem,
     index: Int,
     onClick: () -> Unit
 ) {
-    // 进入动画
-    val animatedVisibility = remember { Animatable(0f) }
-
-    LaunchedEffect(Unit) {
-        delay(index * 50L)
-        animatedVisibility.animateTo(
-            1f,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            )
-        )
-    }
-
-    val scale by animateFloatAsState(
-        targetValue = 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "scale"
-    )
-
     Surface(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .scale(scale * animatedVisibility.value)
-            .alpha(animatedVisibility.value),
+        modifier = Modifier.fillMaxWidth(),
         color = when {
-            item.isSelected -> Color(0x25FF6B9D)
+            item.isSelected -> Brush.horizontalGradient(
+                listOf(
+                    Color(0x30FF6B9D),
+                    Color(0x20D946EF)
+                )
+            ).let { Color(0x25FF6B9D) }
             else -> Color.Transparent
         },
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(18.dp)
     ) {
         Row(
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 24.dp, vertical = 18.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 图标容器
-            Box {
+            // 左侧装饰条
+            if (item.isSelected) {
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
+                        .width(4.dp)
+                        .height(24.dp)
                         .background(
-                            if (item.isSelected) {
-                                Brush.linearGradient(
-                                    listOf(
-                                        Color(0xFFFF6B9D),
-                                        Color(0xFFD946EF)
-                                    )
+                            Brush.verticalGradient(
+                                listOf(
+                                    Color(0xFFFF6B9D),
+                                    Color(0xFFD946EF)
                                 )
-                            } else {
-                                Brush.linearGradient(
-                                    listOf(
-                                        Color(0x15FF6B9D),
-                                        Color(0x20FFB3D1)
-                                    )
-                                )
-                            },
-                            CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = if (item.isSelected) item.filledIcon else item.icon,
-                        contentDescription = item.title,
-                        tint = if (item.isSelected) Color.White else Color(0xFF8B5A96),
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-                // 新内容指示器
-                if (item.hasNewContent && !item.isSelected) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .align(Alignment.TopEnd)
-                            .background(Color(0xFFFF4757), CircleShape)
-                    )
-                }
+                            ),
+                            RoundedCornerShape(2.dp)
+                        )
+                )
+                Spacer(Modifier.width(16.dp))
             }
-
-            Spacer(Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = item.title,
-                    fontSize = 16.sp,
-                    fontWeight = if (item.isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                    color = if (item.isSelected) Color(0xFF2D1B35) else Color(0xFF4A5568)
+                    fontSize = 17.sp,
+                    fontWeight = if (item.isSelected) FontWeight.Bold else FontWeight.Medium,
+                    color = if (item.isSelected) Color(0xFF2D1B35) else Color(0xFF4A5568),
+                    letterSpacing = 0.3.sp
                 )
             }
 
@@ -403,23 +356,40 @@ private fun EnhancedDrawerItem(
                 item.isSelected -> {
                     Box(
                         modifier = Modifier
-                            .size(8.dp)
-                            .background(Color(0xFFFF6B9D), CircleShape)
+                            .size(10.dp)
+                            .background(
+                                Brush.radialGradient(
+                                    listOf(
+                                        Color(0xFFFF6B9D),
+                                        Color(0xFFD946EF)
+                                    )
+                                ),
+                                CircleShape
+                            )
                     )
                 }
                 else -> {
-                    Icon(
-                        Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = Color(0xFFB0B7C3),
-                        modifier = Modifier.size(18.dp)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .background(
+                                Color(0x10B0B7C3),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = Color(0xFFB0B7C3),
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
                 }
             }
         }
     }
 }
-
 @Composable
 private fun EnhancedDrawerFooter() {
     Column {
