@@ -85,7 +85,7 @@ data class SakuraMovement(
 private fun createRandomSakura(screenWidth: Int, screenHeight: Int): SakuraState {
     val x = Random.nextFloat() * screenWidth
     val y = Random.nextFloat() * screenHeight
-    val size = 0.5f + Random.nextFloat() * 0.5f  // 0.5 到 1.0
+    val size = 0.8f + Random.nextFloat() * 0.5f  // 0.5 到 1.0
     val rotation = Random.nextFloat() * 6f
 
     val movement = SakuraMovement(
@@ -103,8 +103,8 @@ private fun createRandomSakura(screenWidth: Int, screenHeight: Int): SakuraState
 @Composable
 fun SakuraAnimation(
     modifier: Modifier = Modifier,
-    sakuraCount: Int = 30,
-    animationSpeed: Long = 10L
+    sakuraCount: Int = 10,
+    animationSpeed: Long = 20L
 ) {
     // 使用 remember 保存樱花状态列表，避免重新创建
     var sakuraList by remember { mutableStateOf<List<SakuraState>>(emptyList()) }
