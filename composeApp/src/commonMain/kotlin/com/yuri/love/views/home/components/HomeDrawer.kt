@@ -85,7 +85,6 @@ fun LovelyEnhancedDrawer(onCloseDrawer: () -> Unit = {}) {
                     val item = drawerItems[index]
                     EnhancedDrawerItem(
                         item = item,
-                        index = index,
                         onClick = onCloseDrawer
                     )
                 }
@@ -300,7 +299,6 @@ private fun StatCard(label: String, value: String, modifier: Modifier = Modifier
 @Composable
 private fun EnhancedDrawerItem(
     item: EnhancedDrawerMenuItem,
-    index: Int,
     onClick: () -> Unit
 ) {
     Surface(
