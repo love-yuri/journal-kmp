@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,21 +16,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yuri.love.styles.GlobalFonts
+import cafe.adriel.voyager.navigator.LocalNavigator
+import com.yuri.love.share.GlobalFonts
+import com.yuri.love.views.home.TestScreen
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.date
 import journal.composeapp.generated.resources.weather_sun
@@ -42,11 +42,15 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun JournalCardComposable() {
+    val navigator = LocalNavigator.current
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .border(width = 1.dp, color = Color(0xFFFFB3D1),
-                shape = RoundedCornerShape(10.dp))
+                shape = RoundedCornerShape(10.dp)
+            ).clickable{
+                navigator?.push(TestScreen())
+            }
             ,
         shape = RoundedCornerShape(10.dp),
     ) {
