@@ -24,7 +24,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yuri.love.styles.GlobalColors
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.yuri.love.database.JournalService
+import com.yuri.love.share.GlobalColors
+import com.yuri.love.share.JournalDatabaseName
+import com.yuri.love.views.create.CreateScreen
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.kiss
 import journal.composeapp.generated.resources.more
@@ -34,6 +40,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun TapBar(scope: CoroutineScope, drawerState: DrawerState) {
+    val navigator = LocalNavigator.currentOrThrow
     Box( modifier = Modifier.fillMaxWidth().height(50.dp)) {
         Box(
             modifier = Modifier
@@ -58,7 +65,6 @@ fun TapBar(scope: CoroutineScope, drawerState: DrawerState) {
                     ),
                 contentAlignment = Alignment.Center
             ) {
-
                 Image(
                     painter = painterResource(Res.drawable.more),
                     contentDescription = null,
@@ -80,6 +86,7 @@ fun TapBar(scope: CoroutineScope, drawerState: DrawerState) {
                         interactionSource = remember { MutableInteractionSource() },
                         indication = LocalIndication.current,
                         onClick = {
+                            navigator.push(CreateScreen())
                         }
                     ),
                 contentAlignment = Alignment.Center
@@ -92,4 +99,9 @@ fun TapBar(scope: CoroutineScope, drawerState: DrawerState) {
             }
         }
     }
+}
+
+@Composable
+private fun OnClick() {
+
 }

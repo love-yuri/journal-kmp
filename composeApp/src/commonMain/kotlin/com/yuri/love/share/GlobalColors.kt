@@ -1,6 +1,5 @@
-package com.yuri.love.styles
+package com.yuri.love.share
 
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 

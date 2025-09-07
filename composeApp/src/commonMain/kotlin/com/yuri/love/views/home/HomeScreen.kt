@@ -7,34 +7,33 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import com.yuri.love.styles.GlobalColors
+import com.yuri.love.retrofit.WeatherService
+import com.yuri.love.share.GlobalColors
+import com.yuri.love.utils.platformSafeTopPadding
 import com.yuri.love.views.home.components.DiaryHeaderAdvanced
 import com.yuri.love.views.home.components.JournalCardComposable
 import com.yuri.love.views.home.components.LovelyEnhancedDrawer
 import com.yuri.love.views.home.components.TapBar
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
-@Composable
-fun Modifier.platformSafeTopPadding(): Modifier {
-    if (!LocalInspectionMode.current) {
-        return this.statusBarsPadding()
-    }
-    return this
-}
 
 /**
  * 主页
  */
-class HomeScreen : Screen {
+class HomeScreen: Screen {
     @Composable
     override fun Content() {
         CreateHome()
+        LaunchedEffect(Unit) {
+            val weather = WeatherService.getCurrentWeather()
+            logger{}.info { "weather ${weather.results[0].now.text}" }
+        }
     }
 }
 
