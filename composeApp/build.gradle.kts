@@ -1,6 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +9,22 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    id("app.cash.sqldelight") version "2.1.0"
+    kotlin("plugin.serialization") version "2.2.0"
+}
+
+/* 数据库配置 */
+repositories {
+    google()
+    mavenCentral()
+}
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("com.yuri.love")
+        }
+    }
 }
 
 kotlin {
@@ -23,7 +40,9 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_21)
+            languageVersion.set(KotlinVersion.KOTLIN_2_2)
+            apiVersion.set(KotlinVersion.KOTLIN_2_2)
         }
     }
     
@@ -31,10 +50,18 @@ kotlin {
     
     sourceSets {
         androidMain.dependencies {
+            implementation(libs.android.driver)
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
+            /* retrofit */
+            implementation(libs.retrofit)
+            implementation(libs.converter.kotlinx.serialization)
+
+            /* kotlin serialization */
+            implementation(libs.kotlinx.serialization.json)
+
             /* kotlinx datetime */
             implementation(libs.kotlinx.datetime)
 
@@ -64,6 +91,9 @@ kotlin {
             implementation(libs.kotlin.test)
         }
         jvmMain.dependencies {
+            /* database */
+            implementation(libs.sqlite.driver)
+
             /* logback logger */
             implementation(libs.ch.logback.classic)
 
