@@ -1,23 +1,17 @@
 package com.yuri.love.views.create
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
@@ -27,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
+import com.yuri.love.share.GlobalValue
 import com.yuri.love.utils.platformSafeTopPadding
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import java.text.SimpleDateFormat
@@ -43,12 +37,9 @@ class CreateScreen: Screen {
         var title by remember { mutableStateOf("") }
         var content by remember { mutableStateOf("") }
         val scrollState = rememberScrollState()
-
         val currentDate = remember {
             SimpleDateFormat("MM/dd", Locale.getDefault()).format(Date())
         }
-
-        val weather = "☀️ 22°"
 
         // 简洁的配色
         val primaryColor = Color(0xFFFFB6C1)
@@ -96,7 +87,7 @@ class CreateScreen: Screen {
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = weather,
+                            text = GlobalValue.weather,
                             fontSize = 15.sp,
                             color = textSecondary
                         )

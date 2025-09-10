@@ -1,5 +1,6 @@
 package com.yuri.love.retrofit
 
+import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.WeatherApiKey
 import com.yuri.love.share.WeatherApiUrl
 import com.yuri.love.share.json
@@ -61,3 +62,10 @@ interface WeatherApi {
     ): WeatherResponse
 }
 
+suspend fun initCurrentWeather() {
+    val weathers = WeatherService.getCurrentWeather()
+    if (weathers.results.isNotEmpty()) {
+        val weather = weathers.results.first().now
+        GlobalValue.weather = "${weather.text} ${weather.temperature}℃"
+    }
+}
