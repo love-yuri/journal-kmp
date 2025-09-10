@@ -30,10 +30,6 @@ class HomeScreen: Screen {
     @Composable
     override fun Content() {
         CreateHome()
-        LaunchedEffect(Unit) {
-            val weather = WeatherService.getCurrentWeather()
-            logger{}.info { "weather ${weather.results[0].now.text}" }
-        }
     }
 }
 
