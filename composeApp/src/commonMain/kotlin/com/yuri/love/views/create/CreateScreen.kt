@@ -21,7 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import com.yuri.love.Journal
+import com.yuri.love.database.JournalService
 import com.yuri.love.share.GlobalValue
+import com.yuri.love.utils.TimeUtils
 import com.yuri.love.utils.platformSafeTopPadding
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import java.text.SimpleDateFormat
@@ -94,7 +98,9 @@ class CreateScreen: Screen {
                     }
 
                     IconButton(
-                        onClick = { navigator?.pop() },
+                        onClick = {
+                            addJournal(title, content, navigator)
+                        },
                         modifier = Modifier.size(44.dp)
                     ) {
                         Icon(
@@ -245,4 +251,18 @@ class CreateScreen: Screen {
             }
         }
     }
+}
+
+private fun addJournal(title: String, content: String, navigator: Navigator?) {
+    val journal = Journal(
+        id = -1,
+        title = title,
+        content = content,
+        createdAt = TimeUtils.now,
+        updatedAt = TimeUtils.now,
+        mood = "",
+        weather = GlobalValue.weather
+    )
+    JournalService.query.insert(journal)
+    navigator?.pop()
 }
