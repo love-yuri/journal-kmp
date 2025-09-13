@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -27,24 +26,32 @@ import com.yuri.love.Journal
 import com.yuri.love.database.JournalService
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.utils.TimeUtils
+import com.yuri.love.utils.TimeUtils.nowTime
 import com.yuri.love.utils.algorithm.SnowFlake
 import com.yuri.love.utils.platformSafeTopPadding
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlin.time.ExperimentalTime
 
-class CreateScreen: Screen {
+
+class CreateScreen(val journal: Journal? = null): Screen {
+    private val isUpdate get() = journal != null
+
     @Preview
     @Composable
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
     override fun Content() {
         val navigator = LocalNavigator.current
 
-        var title by remember { mutableStateOf("") }
-        var content by remember { mutableStateOf("") }
+        var title by remember { mutableStateOf(journal?.title ?: "")  }
+        var content by remember { mutableStateOf(journal?.content ?: "") }
         val scrollState = rememberScrollState()
         val currentDate = remember {
-            SimpleDateFormat("MM/dd", Locale.getDefault()).format(Date())
+            val localDate = nowTime.toLocalDateTime(TimeZone.currentSystemDefault()).date
+            "${localDate.month.number}/${localDate.day}"
         }
 
         // 简洁的配色
@@ -101,7 +108,12 @@ class CreateScreen: Screen {
 
                     IconButton(
                         onClick = {
-                            addJournal(title, content, navigator)
+                            if (isUpdate) {
+                                updateJournal(journal, title, content)
+                            } else {
+                                addJournal(title, content)
+                            }
+                            navigator?.pop()
                         },
                         modifier = Modifier.size(44.dp)
                     ) {
@@ -255,10 +267,10 @@ class CreateScreen: Screen {
     }
 }
 
-private fun addJournal(title: String, content: String, navigator: Navigator?) {
+private fun addJournal(title: String?, content: String) {
     val journal = Journal(
         id = SnowFlake.nextId(),
-        title = title,
+        title = title?.ifEmpty { null },
         content = content,
         createdAt = TimeUtils.now,
         updatedAt = TimeUtils.now,
@@ -266,5 +278,17 @@ private fun addJournal(title: String, content: String, navigator: Navigator?) {
         weather = GlobalValue.weather
     )
     JournalService.query.insert(journal)
-    navigator?.pop()
+}
+
+private fun updateJournal(journal: Journal?, title: String?, content: String) {
+    journal ?: throw RuntimeException("journal is null, update error!")
+    JournalService.query.updateById(
+        title = title?.ifEmpty { null },
+        content = content,
+        updatedAt = TimeUtils.now,
+        id = journal.id,
+        mood = journal.mood,
+        weather = journal.weather
+    )
+    logger {}.info { "update success!!" }
 }

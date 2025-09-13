@@ -1,8 +1,8 @@
 -- 日记表
 CREATE TABLE Journal (
     id INTEGER PRIMARY KEY NOT NULL,
-    title TEXT NOT NULL,
-    content TEXT,
+    title TEXT,
+    content TEXT NOT NULL,
     createdAt INTEGER NOT NULL, -- 创建日期
     updatedAt INTEGER NOT NULL, -- 更新日期
     mood TEXT, -- 心情
@@ -12,9 +12,6 @@ CREATE TABLE Journal (
 all: SELECT * FROM Journal;
 getById: SELECT * FROM Journal WHERE id = ?;
 insert: INSERT INTO Journal VALUES ?;
-
--- https://api.seniverse.com/v3/weather/now.json?key=S4gOH8lQuBXpjpLGv&location=ip&language=zh-Hans&unit=c
-
--- https://restapi.amap.com/v3/weather/weatherInfo?key=28e29bb3c2f92811dbd3e99c72c5b0d2&city=110000&extensions=all
---
--- https://api.seniverse.com/v3/weather/daily.json?key=S4gOH8lQuBXpjpLGv&location=beijing&language=zh-Hans&unit=c&start=-1&days=5
+page: SELECT * FROM Journal ORDER BY createdAt DESC LIMIT ? OFFSET ?;
+size: SELECT COUNT(*) FROM Journal;
+updateById: UPDATE Journal SET title = ?, content = ?, mood = ?, weather = ?, updatedAt = ? WHERE id = ?;

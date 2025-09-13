@@ -27,7 +27,7 @@ import com.yuri.love.Journal
 import com.yuri.love.share.GlobalFonts
 import com.yuri.love.utils.TimeUtils.formatTimestampDay
 import com.yuri.love.utils.TimeUtils.formatTimestampTime
-import com.yuri.love.views.home.TestScreen
+import com.yuri.love.views.create.CreateScreen
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.date
 import journal.composeapp.generated.resources.weather_sun
@@ -100,7 +100,7 @@ fun JournalCardComposable(journal: Journal = Journal(
                             isPressed = false
                         },
                         onTap = {
-                            navigator?.push(TestScreen())
+                            navigator?.push(CreateScreen(journal))
                         }
                     )
                 }
@@ -151,7 +151,7 @@ fun JournalCardComposable(journal: Journal = Journal(
                     verticalAlignment = Alignment.Top
                 ) {
                     Text(
-                        text = journal.title,
+                        text = journal.title?.takeIf { it.isNotEmpty() } ?: journal.content.take(20),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         lineHeight = 22.sp,
@@ -286,7 +286,7 @@ fun MoodIndicator(
         shape = CircleShape,
         color = Color(0xFFFFE4E1),
         modifier = Modifier
-            .size(32.dp)
+            .size(24.dp)
             .graphicsLayer {
                 scaleX = pulseScale.value
                 scaleY = pulseScale.value
