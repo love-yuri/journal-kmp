@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import com.yuri.love.Journal
-import com.yuri.love.flow.JournalFlow
+import com.yuri.love.database.JournalService
 import com.yuri.love.share.GlobalColors
 import com.yuri.love.utils.platformSafeTopPadding
 import com.yuri.love.views.home.components.DiaryHeaderAdvanced
@@ -39,11 +39,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 class HomeScreen: Screen {
     @Composable
     override fun Content() {
-        // 使用viewModel()委托来创建和管理ViewModel
-        val journalViewModel: JournalFlow = viewModel()
-
         // 收集StateFlow状态
-        val journals by journalViewModel.journals.collectAsState()
+        val journals by JournalService.journals.collectAsState()
 
         CreateHome(journals)
     }
@@ -96,7 +93,7 @@ private fun CreateHome(journals: List<Journal>) {
                         modifier = Modifier
                             .background(GlobalColors.softPinkGradient)
                             .padding(start = 10.dp, end = 10.dp)
-                            .fillMaxSize()
+                            .weight(1f)
                     ) {
                         DiaryHeaderAdvanced()
                         AnimatedVisibility(visible = showContent) {
