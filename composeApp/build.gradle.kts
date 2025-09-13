@@ -55,6 +55,9 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
+            /* sqldelight flow extensions */
+            implementation(libs.coroutines.extensions)
+
             /* retrofit */
             implementation(libs.retrofit)
             implementation(libs.converter.kotlinx.serialization)
