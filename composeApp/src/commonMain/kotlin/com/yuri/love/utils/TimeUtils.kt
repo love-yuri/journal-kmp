@@ -12,6 +12,9 @@ object TimeUtils {
     val now: Long get() = Clock.System.now().toEpochMilliseconds()
 
     @OptIn(ExperimentalTime::class)
+    val nowTime = Clock.System.now()
+
+    @OptIn(ExperimentalTime::class)
     fun formatTimestampDay(timestampMillis: Long): String {
         val instant = Instant.fromEpochMilliseconds(timestampMillis)
         val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
