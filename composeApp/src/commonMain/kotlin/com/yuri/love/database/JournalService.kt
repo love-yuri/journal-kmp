@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.time.ExperimentalTime
@@ -24,30 +27,43 @@ import kotlin.time.ExperimentalTime
  */
 object JournalService {
     const val SIZE = 10L
-    var page = 0L
+    private val _currentPage = MutableStateFlow(0L) // 使用 StateFlow 管理页码
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val _journals = MutableStateFlow<MutableList<Journal>>(mutableListOf())
-    val journals: StateFlow<MutableList<Journal>> = _journals.asStateFlow()
+    private val _journals = MutableStateFlow<List<Journal>>(emptyList())
+    val journals: StateFlow<List<Journal>> = _journals.asStateFlow()
     private val log = logger {}
 
     val query: JournalQueries by lazy {
         val driver = DriverFactory.create().createDriver(JournalDatabaseName)
-        Database.Companion(driver).journalQueries
+        Database(driver).journalQueries
     }
 
     init {
+        // 监听页码变化，自动加载对应页数据
         scope.launch {
-            page()
+            _currentPage.collect { page ->
+                val size = query.size().executeAsOne()
+                if (size > _journals.value.size) {
+                    loadPage(page)
+                }
+            }
         }
     }
 
-    suspend fun page() {
-        ++page
-        query.page(SIZE, (page - 1) * SIZE)
+    // 加载指定页数据
+    private suspend fun loadPage(page: Long) {
+        val offset = page * SIZE
+        query.page(SIZE, offset)
             .asFlow()
             .mapToList(Dispatchers.IO)
-            .collect {
-                _journals.value.addAll(it)
+            .distinctUntilChanged() // 避免重复数据触发更新
+            .first() // 只取第一次结果，避免持续监听
+            .let { data ->
+                _journals.update { _journals.value + data }
             }
+    }
+
+    fun nextPage() {
+        _currentPage.update { it + 1 }
     }
 }
