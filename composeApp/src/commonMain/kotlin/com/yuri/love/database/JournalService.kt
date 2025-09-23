@@ -11,7 +11,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,8 +18,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.random.Random
-import kotlin.time.ExperimentalTime
 
 /**
  * sql服务
@@ -33,7 +30,7 @@ object JournalService {
     val journals: StateFlow<List<Journal>> = _journals.asStateFlow()
     private val log = logger {}
 
-    val query: JournalQueries by lazy {
+    private val query: JournalQueries by lazy {
         val driver = DriverFactory.create().createDriver(JournalDatabaseName)
         Database(driver).journalQueries
     }
@@ -63,6 +60,29 @@ object JournalService {
             }
     }
 
+    /**
+     * update journal
+     */
+    fun update(journal: Journal) {
+        val res = query.updateById (
+            journal.title,
+            journal.content,
+            journal.mood,
+            journal.weather,
+            TimeUtils.now,
+            journal.id
+        ).value
+
+
+    }
+
+    fun insert(journal: Journal) {
+        query.insert(journal)
+    }
+
+    /**
+     * load next page
+     */
     fun nextPage() {
         _currentPage.update { it + 1 }
     }
