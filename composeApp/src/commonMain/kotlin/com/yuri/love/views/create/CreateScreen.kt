@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import com.yuri.love.Journal
 import com.yuri.love.database.JournalService
 import com.yuri.love.share.GlobalValue
@@ -108,12 +107,16 @@ class CreateScreen(val journal: Journal? = null): Screen {
 
                     IconButton(
                         onClick = {
-                            if (isUpdate) {
-                                updateJournal(journal, title, content)
-                            } else {
-                                addJournal(title, content)
+                            try {
+                                if (isUpdate) {
+                                    updateJournal(journal, title, content)
+                                } else {
+                                    addJournal(title, content)
+                                }
+                                navigator?.pop()
+                            } catch (e: Exception) {
+
                             }
-                            navigator?.pop()
                         },
                         modifier = Modifier.size(44.dp)
                     ) {
@@ -277,18 +280,14 @@ private fun addJournal(title: String?, content: String) {
         mood = "",
         weather = GlobalValue.weather
     )
-    JournalService.query.insert(journal)
+    JournalService.insert(journal)
 }
 
 private fun updateJournal(journal: Journal?, title: String?, content: String) {
     journal ?: throw RuntimeException("journal is null, update error!")
-    JournalService.query.updateById(
+    JournalService.update (journal.copy(
         title = title?.ifEmpty { null },
         content = content,
-        updatedAt = TimeUtils.now,
-        id = journal.id,
-        mood = journal.mood,
-        weather = journal.weather
-    )
+    ))
     logger {}.info { "update success!!" }
 }
