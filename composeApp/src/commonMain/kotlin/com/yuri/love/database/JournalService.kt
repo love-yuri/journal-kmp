@@ -63,7 +63,7 @@ object JournalService {
     /**
      * update journal
      */
-    fun update(journal: Journal) {
+    fun update(journal: Journal): Boolean {
         val res = query.updateById (
             journal.title,
             journal.content,
@@ -71,13 +71,27 @@ object JournalService {
             journal.weather,
             TimeUtils.now,
             journal.id
-        ).value
+        ).value > 0
 
-
+        if (res) {
+            _journals.update { currentList ->
+                val index = currentList.indexOfFirst { it.id == journal.id }
+                if (index != -1) {
+                    currentList.toMutableList().also { it[index] = journal }
+                } else {
+                    currentList
+                }
+            }
+        }
+        return res
     }
 
-    fun insert(journal: Journal) {
-        query.insert(journal)
+    fun insert(journal: Journal): Boolean {
+        val res = query.insert(journal).value > 0
+        if (res) {
+            _journals.update { it + journal }
+        }
+        return res
     }
 
     /**

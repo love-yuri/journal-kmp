@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import com.yuri.love.utils.algorithm.SnowFlake
 
 enum class NotificationType {
     Info,
@@ -45,6 +46,22 @@ class NotificationState {
 
     fun addNotification(notification: Notification) {
         _notifications.add(notification)
+    }
+
+    fun success(content: String) {
+        addNotification(Notification(
+            id = SnowFlake.nextId(),
+            content = content,
+            type = NotificationType.Success
+        ))
+    }
+
+    fun error(content: String) {
+        addNotification(Notification(
+            id = SnowFlake.nextId(),
+            content = content,
+            type = NotificationType.Error
+        ))
     }
 
     fun removeNotification(id: Long) {
