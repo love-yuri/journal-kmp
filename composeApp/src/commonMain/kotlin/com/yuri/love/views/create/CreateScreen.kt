@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -27,6 +28,8 @@ import com.yuri.love.share.GlobalValue
 import com.yuri.love.utils.TimeUtils
 import com.yuri.love.utils.TimeUtils.nowTime
 import com.yuri.love.utils.algorithm.SnowFlake
+import com.yuri.love.utils.notification.Notification
+import com.yuri.love.utils.notification.NotificationType
 import com.yuri.love.utils.platformSafeTopPadding
 import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.datetime.TimeZone
@@ -115,7 +118,7 @@ class CreateScreen(val journal: Journal? = null): Screen {
                                 }
                                 navigator?.pop()
                             } catch (e: Exception) {
-
+                                Notification.notificationState?.error("操作失败 -> ${e.message}")
                             }
                         },
                         modifier = Modifier.size(44.dp)
@@ -143,46 +146,50 @@ class CreateScreen(val journal: Journal? = null): Screen {
                     .padding(horizontal = 16.dp)
             ) {
                 // 标题输入
-                TextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    placeholder = {
-                        Text(
-                            "标题",
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .padding(horizontal = 5.dp)
+                ) {
+                    BasicTextField(
+                        value = title,
+                        modifier = Modifier.align(Alignment.CenterStart),
+                        onValueChange = { title = it },
+                        singleLine = true,
+                        textStyle = LocalTextStyle.current.copy(
                             fontSize = 28.sp,
-                            color = textTertiary,
-                            fontWeight = FontWeight.Normal
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Sentences
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = primaryColor
-                    ),
-                    textStyle = LocalTextStyle.current.copy(
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = textPrimary,
-                        lineHeight = 36.sp
+                            fontWeight = FontWeight.Bold,
+                            color = textPrimary,
+                            lineHeight = 32.sp
+                        ),
+                        cursorBrush = SolidColor(primaryColor),
+                        decorationBox = { innerTextField ->
+                            if (title.isEmpty()) {
+                                Text(
+                                    text = "标题",
+                                    fontSize = 28.sp,
+                                    color = textTertiary,
+                                    fontWeight = FontWeight.Normal,
+                                    lineHeight = 32.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                            innerTextField()
+                        }
                     )
-                )
+                }
+
 
                 // 标题下分割线
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(3.dp)
+                        .height(1.dp)
                         .background(primaryColor)
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(3.dp))
 
                 // 内容编辑区域
                 Box(
@@ -280,14 +287,23 @@ private fun addJournal(title: String?, content: String) {
         mood = "",
         weather = GlobalValue.weather
     )
-    JournalService.insert(journal)
+    if (JournalService.insert(journal)) {
+        Notification.notificationState?.success("日记已保存!")
+        return
+    }
+    throw RuntimeException("保存失败!")
 }
 
 private fun updateJournal(journal: Journal?, title: String?, content: String) {
     journal ?: throw RuntimeException("journal is null, update error!")
-    JournalService.update (journal.copy(
+    val res = JournalService.update (journal.copy(
         title = title?.ifEmpty { null },
         content = content,
     ))
-    logger {}.info { "update success!!" }
+    if (res) {
+        Notification.notificationState?.success("更新成功")
+        return
+    }
+
+    throw RuntimeException("更新失败!")
 }
