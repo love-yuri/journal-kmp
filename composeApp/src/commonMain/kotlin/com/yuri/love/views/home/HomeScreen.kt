@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -104,7 +105,6 @@ private fun CreateHome(journals: List<Journal>) {
 @OptIn(FlowPreview::class)
 @Composable
 fun JournalListScreen(journals: List<Journal>) {
-    val log = logger {}
     val listState = rememberLazyListState()
     var isLoadingMore by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
@@ -161,7 +161,6 @@ fun JournalListScreen(journals: List<Journal>) {
                         if (y >= refreshThreshold && !isRefreshing) {
                             scope.launch {
                                 isRefreshing = true
-                                // 模拟刷新逻辑
                                 delay(500)
                                 isRefreshing = false
                                 y = 0f
@@ -171,16 +170,14 @@ fun JournalListScreen(journals: List<Journal>) {
                         }
                     }
                 ) { _, dragAmount ->
-                    // 只在列表顶部时允许下拉
-                    if (listState.firstVisibleItemIndex == 0 &&
-                        listState.firstVisibleItemScrollOffset <= 0) {
+                    if (listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset <= 0) {
                         val newY = (y + dragAmount.y * 0.5f).coerceAtLeast(0f)
                         y = newY.coerceAtMost(maxPullDistance)
                     }
                 }
             }
     ) {
-        // 精致的下拉刷新指示器
+        // 下拉刷新指示器
         item {
             ElegantPullRefreshIndicator(
                 offset = animatedOffset,
@@ -190,8 +187,42 @@ fun JournalListScreen(journals: List<Journal>) {
         }
 
         items(journals) { journal ->
-            JournalCardComposable(journal)
+            AnimatedJournalItem(journal)
         }
+    }
+}
+
+@Composable
+fun AnimatedJournalItem(journal: Journal) {
+    val log = logger {  }
+    var hasAppeared by remember { mutableStateOf(false) }
+
+    val offsetY by animateDpAsState(
+        targetValue = if (hasAppeared) 0.dp else 60.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow,
+        ),
+    )
+
+    val alpha by animateFloatAsState(
+        targetValue = if (hasAppeared) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = FastOutSlowInEasing
+        ),
+    )
+
+    LaunchedEffect(journal.id) {
+        hasAppeared = true
+    }
+
+    Box(
+        modifier = Modifier
+            .offset(y = offsetY)
+            .alpha(alpha)
+    ) {
+        JournalCardComposable(journal)
     }
 }
 
