@@ -74,6 +74,7 @@ kotlin {
             /* voyager navigator */
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.koin)
+            implementation(libs.voyager.transitions)
 
             // Material Icons - 核心图标包
             implementation(libs.androidx.material3)

@@ -1,7 +1,8 @@
 [versions]
-agp = "8.7.3"
-android-compileSdk = "35"
-android-minSdk = "24"
+agp = "8.11.2"
+android-compileSdk = "36"
+android-minSdk = "35"
+#noinspection OldTargetApi
 android-targetSdk = "35"
 androidx-activity = "1.10.1"
 androidx-appcompat = "1.7.1"
@@ -13,8 +14,8 @@ composeHotReload = "1.0.0-beta04"
 composeMultiplatform = "1.8.2"
 converterKotlinxSerialization = "3.0.0"
 junit = "4.13.2"
-kotlin = "2.2.10"
-kotlinLogging = "7.0.12"
+kotlin = "2.2.20"
+kotlinLogging = "7.0.13"
 kotlinx-coroutines = "1.10.2"
 kotlinxDatetime = "0.7.1"
 kotlinxSerializationJson = "1.9.0"
@@ -23,7 +24,7 @@ material3 = "1.3.2"
 materialIconsCore = "1.7.8"
 nativeDriver = "2.1.0"
 retrofit = "3.0.0"
-voyagerVersion = "1.1.0-beta02"
+voyagerVersion = "1.1.0-beta03"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "nativeDriver" }
@@ -54,6 +55,7 @@ runtime = { module = "app.cash.sqldelight:runtime", version.ref = "nativeDriver"
 sqlite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "nativeDriver" }
 voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyagerVersion" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyagerVersion" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyagerVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
