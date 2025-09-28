@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import com.yuri.love.retrofit.initCurrentWeather
 import com.yuri.love.utils.notification.NotificationContainer
+import com.yuri.love.utils.platformSafeTopPadding
 import com.yuri.love.views.home.HomeScreen
 import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -30,8 +31,8 @@ fun App() {
         Box(modifier = Modifier.fillMaxSize()) {
             Navigator(HomeScreen())
             NotificationContainer(Modifier
-                .align(Alignment.TopEnd)
-                .offset(x = (-10).dp)
+                .align(Alignment.TopCenter)
+                .platformSafeTopPadding()
             )
         }
     }.also {
