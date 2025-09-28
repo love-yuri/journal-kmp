@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.transitions.SlideTransition
 import com.yuri.love.retrofit.initCurrentWeather
 import com.yuri.love.utils.notification.NotificationContainer
 import com.yuri.love.utils.platformSafeTopPadding
@@ -29,7 +30,11 @@ fun App() {
 
     MaterialTheme {
         Box(modifier = Modifier.fillMaxSize()) {
-            Navigator(HomeScreen())
+            Navigator(
+                screen = HomeScreen(),
+            )  { navigator ->
+                SlideTransition(navigator)
+            }
             NotificationContainer(Modifier
                 .align(Alignment.TopCenter)
                 .platformSafeTopPadding()
