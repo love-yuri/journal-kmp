@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -14,9 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,15 +28,19 @@ import com.yuri.love.utils.TimeUtils
 import com.yuri.love.utils.TimeUtils.nowTime
 import com.yuri.love.utils.algorithm.SnowFlake
 import com.yuri.love.utils.notification.Notification
-import com.yuri.love.utils.notification.NotificationType
 import com.yuri.love.utils.platformSafeTopPadding
-import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.ExperimentalTime
 
+private val primaryColor = Color(0xFFFFB6C1)
+private val backgroundColor = Color(0xFFFFFFFF)
+private val textPrimary = Color(0xFF111827)
+private val textSecondary = Color(0xFF6B7280)
+private val textTertiary = Color(0xFF9CA3AF)
+private val dividerColor = Color(0xFFE5E7EB)
 
 class CreateScreen(val journal: Journal? = null): Screen {
     private val isUpdate get() = journal != null
@@ -56,16 +59,14 @@ class CreateScreen(val journal: Journal? = null): Screen {
             "${localDate.month.number}/${localDate.day}"
         }
 
-        // 简洁的配色
-        val primaryColor = Color(0xFFFFB6C1)
-        val backgroundColor = Color(0xFFFFFFFF)
-        val textPrimary = Color(0xFF111827)
-        val textSecondary = Color(0xFF6B7280)
-        val textTertiary = Color(0xFF9CA3AF)
-        val dividerColor = Color(0xFFE5E7EB)
+        val imeInsets = WindowInsets.ime
+        val imeBottom = with(LocalDensity.current) {
+            imeInsets.getBottom(this).toDp()
+        }
 
         Column(
             modifier = Modifier
+                .padding(bottom = imeBottom)
                 .fillMaxSize()
                 .background(backgroundColor)
         ) {
@@ -149,7 +150,7 @@ class CreateScreen(val journal: Journal? = null): Screen {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .heightIn(50.dp)
                         .padding(horizontal = 5.dp)
                 ) {
                     BasicTextField(
@@ -206,9 +207,8 @@ class CreateScreen(val journal: Journal? = null): Screen {
                         value = content,
                         onValueChange = { content = it },
                         textStyle = TextStyle(
-                            fontSize = 17.sp,
+                            fontSize = 16.sp,
                             color = textPrimary,
-                            lineHeight = 26.sp,
                             fontWeight = FontWeight.Normal
                         ),
                         cursorBrush = SolidColor(primaryColor),
@@ -217,14 +217,17 @@ class CreateScreen(val journal: Journal? = null): Screen {
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(vertical = 8.dp)
+                                    .padding(vertical = 8.dp),
                             ) {
                                 if (content.isEmpty()) {
                                     Text(
                                         text = "写点什么...",
                                         color = textTertiary,
-                                        fontSize = 17.sp,
-                                        lineHeight = 26.sp
+                                        style = TextStyle(
+                                            fontSize = 16.sp,
+                                            color = textPrimary,
+                                            fontWeight = FontWeight.Normal,
+                                        ),
                                     )
                                 }
                                 innerTextField()
@@ -235,43 +238,48 @@ class CreateScreen(val journal: Journal? = null): Screen {
             }
 
             // 底部状态栏
-            Column {
-                HorizontalDivider(
-                    color = dividerColor,
-                    thickness = 0.5.dp
+            ToolbarWithIme(content)
+        }
+    }
+}
+
+@Composable
+fun ToolbarWithIme(content: String) {
+    Column {
+        HorizontalDivider(
+            color = dividerColor,
+            thickness = 0.5.dp
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "${content.length} 字",
+                fontSize = 14.sp,
+                color = textSecondary,
+                fontWeight = FontWeight.Medium
+            )
+
+            if (content.isNotEmpty()) {
+                Text(
+                    text = when {
+                        content.length < 50 -> "继续..."
+                        content.length < 200 -> "不错"
+                        else -> "很棒"
+                    },
+                    fontSize = 14.sp,
+                    color = when {
+                        content.length < 50 -> Color(0xFFF59E0B)
+                        content.length < 200 -> primaryColor
+                        else -> Color(0xFF10B981)
+                    },
+                    fontWeight = FontWeight.Medium
                 )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "${content.length} 字",
-                        fontSize = 14.sp,
-                        color = textSecondary,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    if (content.isNotEmpty()) {
-                        Text(
-                            text = when {
-                                content.length < 50 -> "继续..."
-                                content.length < 200 -> "不错"
-                                else -> "很棒"
-                            },
-                            fontSize = 14.sp,
-                            color = when {
-                                content.length < 50 -> Color(0xFFF59E0B)
-                                content.length < 200 -> primaryColor
-                                else -> Color(0xFF10B981)
-                            },
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
             }
         }
     }
