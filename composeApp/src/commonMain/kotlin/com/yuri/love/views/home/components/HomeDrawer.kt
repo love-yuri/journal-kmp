@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yuri.love.share.GlobalFonts
+import com.yuri.love.utils.platformSafeTopPadding
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.avatar
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -50,19 +51,25 @@ fun LovelyEnhancedDrawer(onCloseDrawer: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .fillMaxHeight()
-            .width(380.dp)
+            .width(320.dp)
+            .clip(RoundedCornerShape(
+                topEnd = 24.dp,
+                bottomEnd = 24.dp
+            ))
     ) {
         // 梦幻背景
         EnhancedBackground()
-
-        // 樱花特效
-        SakuraAnimation()
 
         // 主要内容
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .platformSafeTopPadding()
+                .padding(
+                    start = 24.dp,
+                    end = 24.dp,
+                    bottom = 24.dp
+                )
         ) {
             EnhancedDrawerHeader()
 
