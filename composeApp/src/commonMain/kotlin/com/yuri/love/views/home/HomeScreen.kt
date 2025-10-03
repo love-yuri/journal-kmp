@@ -8,7 +8,6 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -32,7 +31,6 @@ import com.yuri.love.views.home.components.DiaryHeaderAdvanced
 import com.yuri.love.views.home.components.JournalCardComposable
 import com.yuri.love.views.home.components.LovelyEnhancedDrawer
 import com.yuri.love.views.home.components.TapBar
-import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -52,6 +50,7 @@ class HomeScreen: Screen {
     }
 }
 
+@Suppress("RememberReturnType")
 @Preview
 @Composable
 private fun CreateHome(journals: List<Journal>) {
@@ -67,7 +66,7 @@ private fun CreateHome(journals: List<Journal>) {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
-                ModalDrawerSheet {
+//                ModalDrawerSheet {
                     LovelyEnhancedDrawer(
                         onCloseDrawer = {
                             scope.launch {
@@ -75,7 +74,7 @@ private fun CreateHome(journals: List<Journal>) {
                             }
                         }
                     )
-                }
+//                }
             },
             content = {
                 Column(
@@ -161,7 +160,8 @@ fun JournalListScreen(journals: List<Journal>) {
                         if (y >= refreshThreshold && !isRefreshing) {
                             scope.launch {
                                 isRefreshing = true
-                                delay(500)
+                                JournalService.refresh()
+                                delay(300)
                                 isRefreshing = false
                                 y = 0f
                             }
@@ -194,7 +194,6 @@ fun JournalListScreen(journals: List<Journal>) {
 
 @Composable
 fun AnimatedJournalItem(journal: Journal) {
-    val log = logger {  }
     var hasAppeared by remember { mutableStateOf(false) }
 
     val offsetY by animateDpAsState(
@@ -364,9 +363,7 @@ fun ElegantPullRefreshIndicator(
 }
 
 @Composable
-fun WaterDropEffect(
-    progress: Float
-) {
+fun WaterDropEffect(progress: Float) {
     val dropSize by animateFloatAsState(
         targetValue = (8 + progress * 12),
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)

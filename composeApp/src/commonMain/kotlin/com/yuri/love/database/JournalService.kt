@@ -56,8 +56,17 @@ object JournalService {
             .distinctUntilChanged() // 避免重复数据触发更新
             .first() // 只取第一次结果，避免持续监听
             .let { data ->
-                _journals.update { _journals.value + data }
+                if (page == 0L) {
+                    _journals.update { data }
+                } else {
+                    _journals.update { _journals.value + data }
+                }
             }
+    }
+
+    // 刷新
+    fun refresh() {
+        _currentPage.update { 0 }
     }
 
     /**

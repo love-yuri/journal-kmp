@@ -12,6 +12,6 @@ CREATE TABLE Journal (
 all: SELECT * FROM Journal;
 getById: SELECT * FROM Journal WHERE id = ?;
 insert: INSERT INTO Journal VALUES ?;
-page: SELECT * FROM Journal ORDER BY createdAt DESC LIMIT ? OFFSET ?;
+page: SELECT * FROM Journal ORDER BY updatedAt DESC LIMIT ? OFFSET ? ;
 size: SELECT COUNT(*) FROM Journal;
 updateById: UPDATE Journal SET title = ?, content = ?, mood = ?, weather = ?, updatedAt = ? WHERE id = ?;
