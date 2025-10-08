@@ -14,4 +14,5 @@ getById: SELECT * FROM Journal WHERE id = ?;
 insert: INSERT INTO Journal VALUES ?;
 page: SELECT * FROM Journal ORDER BY updatedAt DESC LIMIT ? OFFSET ? ;
 size: SELECT COUNT(*) FROM Journal;
+journalInfo: SELECT COUNT(*) AS total, COALESCE(SUM(LENGTH(content)), 0) AS totalWords FROM Journal;
 updateById: UPDATE Journal SET title = ?, content = ?, mood = ?, weather = ?, updatedAt = ? WHERE id = ?;

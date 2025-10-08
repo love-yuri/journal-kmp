@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.yuri.love.database.JournalService
 import com.yuri.love.share.GlobalFonts
 import com.yuri.love.utils.platformSafeTopPadding
 import journal.composeapp.generated.resources.Res
@@ -270,11 +271,18 @@ private fun EnhancedDrawerHeader() {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 val modifier = Modifier.weight(1f)
-                StatCard("总文章", "128", modifier)
-                StatCard("总字数", "1.2K", modifier)
+                StatCard("总文章", JournalService.info.total.toString(), modifier)
+                StatCard("总字数", getTotalWords(), modifier)
                 StatCard("总时间", "2年", modifier)
             }
         }
+    }
+}
+
+private fun getTotalWords(): String {
+    return when(val total = JournalService.info.totalWords) {
+        in 0..999 -> "$total"
+        else -> {"${total / 1000}K"}
     }
 }
 

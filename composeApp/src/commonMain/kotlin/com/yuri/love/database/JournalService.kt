@@ -5,6 +5,7 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
 import com.yuri.love.Database
 import com.yuri.love.Journal
+import com.yuri.love.JournalInfo
 import com.yuri.love.JournalQueries
 import com.yuri.love.share.JournalDatabaseName
 import com.yuri.love.utils.TimeUtils
@@ -30,8 +31,10 @@ object JournalService {
     private val _journals = MutableStateFlow<List<Journal>>(emptyList())
     val journals: StateFlow<List<Journal>> = _journals.asStateFlow()
     private val log = logger {}
-
-    var count: Long = 0L
+    var info: JournalInfo = JournalInfo(
+        total = 0,
+        totalWords = 0
+    )
         private set
 
     private val query: JournalQueries by lazy {
@@ -48,14 +51,14 @@ object JournalService {
         }
 
         scope.launch {
-            query.size()
+            query.journalInfo()
                 .asFlow()
                 .mapToOne(Dispatchers.IO)
-                .collect { size ->
-                    if (count != 0.toLong()) {
+                .collect {
+                    info = query.journalInfo().executeAsOne()
+                    if (it.total != 0L) {
                         refresh()
                     }
-                    count = size
                 }
         }
     }
@@ -108,7 +111,7 @@ object JournalService {
      * load next page
      */
     fun nextPage() {
-        if (count > _journals.value.size) {
+        if (info.total > _journals.value.size) {
             _currentPage.update { it + 1 }
         }
     }
