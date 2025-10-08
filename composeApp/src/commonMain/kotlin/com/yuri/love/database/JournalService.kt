@@ -65,8 +65,12 @@ object JournalService {
     }
 
     // 刷新
-    fun refresh() {
-        _currentPage.update { 0 }
+    suspend fun refresh() {
+        if (_currentPage.value != 0L) {
+            _currentPage.update { 0 }
+        } else {
+            loadPage(0L)
+        }
     }
 
     /**
@@ -83,13 +87,8 @@ object JournalService {
         ).value > 0
 
         if (res) {
-            _journals.update { currentList ->
-                val index = currentList.indexOfFirst { it.id == journal.id }
-                if (index != -1) {
-                    currentList.toMutableList().also { it[index] = journal }
-                } else {
-                    currentList
-                }
+            scope.launch {
+                refresh()
             }
         }
         return res
