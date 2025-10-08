@@ -2,6 +2,7 @@ package com.yuri.love.database
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
 import com.yuri.love.Database
 import com.yuri.love.Journal
 import com.yuri.love.JournalQueries
@@ -30,6 +31,9 @@ object JournalService {
     val journals: StateFlow<List<Journal>> = _journals.asStateFlow()
     private val log = logger {}
 
+    var count: Long = 0L
+        private set
+
     private val query: JournalQueries by lazy {
         val driver = DriverFactory.create().createDriver(JournalDatabaseName)
         Database(driver).journalQueries
@@ -39,11 +43,20 @@ object JournalService {
         // 监听页码变化，自动加载对应页数据
         scope.launch {
             _currentPage.collect { page ->
-                val size = query.size().executeAsOne()
-                if (size > _journals.value.size) {
-                    loadPage(page)
-                }
+                loadPage(page)
             }
+        }
+
+        scope.launch {
+            query.size()
+                .asFlow()
+                .mapToOne(Dispatchers.IO)
+                .collect { size ->
+                    if (count != 0.toLong()) {
+                        refresh()
+                    }
+                    count = size
+                }
         }
     }
 
@@ -77,7 +90,7 @@ object JournalService {
      * update journal
      */
     fun update(journal: Journal): Boolean {
-        val res = query.updateById (
+        return query.updateById (
             journal.title,
             journal.content,
             journal.mood,
@@ -85,27 +98,18 @@ object JournalService {
             TimeUtils.now,
             journal.id
         ).value > 0
-
-        if (res) {
-            scope.launch {
-                refresh()
-            }
-        }
-        return res
     }
 
     fun insert(journal: Journal): Boolean {
-        val res = query.insert(journal).value > 0
-        if (res) {
-            _journals.update { it + journal }
-        }
-        return res
+        return query.insert(journal).value > 0
     }
 
     /**
      * load next page
      */
     fun nextPage() {
-        _currentPage.update { it + 1 }
+        if (count > _journals.value.size) {
+            _currentPage.update { it + 1 }
+        }
     }
 }
