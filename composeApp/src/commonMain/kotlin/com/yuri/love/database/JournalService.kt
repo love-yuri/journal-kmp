@@ -55,7 +55,7 @@ object JournalService {
                 .asFlow()
                 .mapToOne(Dispatchers.IO)
                 .collect {
-                    info = query.journalInfo().executeAsOne()
+                    info = it
                     if (it.total != 0L) {
                         refresh()
                     }
