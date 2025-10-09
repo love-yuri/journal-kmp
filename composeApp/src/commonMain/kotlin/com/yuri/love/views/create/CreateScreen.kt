@@ -3,6 +3,8 @@ package com.yuri.love.views.create
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -70,41 +72,57 @@ class CreateScreen(val journal: Journal? = null): Screen {
                 .fillMaxSize()
                 .background(backgroundColor)
         ) {
-            // 顶部导航 - 极简设计
+            // 顶部导航
             Column {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .platformSafeTopPadding()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
                         onClick = { navigator?.pop() },
-                        modifier = Modifier.size(44.dp)
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                color = textPrimary.copy(alpha = 0.05f),
+                                shape = CircleShape
+                            )
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
                             tint = textPrimary,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .background(
+                                color = primaryColor.copy(alpha = 0.08f),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
                         Text(
                             text = currentDate,
-                            fontSize = 15.sp,
+                            fontSize = 13.sp,
                             color = textSecondary,
                             fontWeight = FontWeight.Medium
                         )
+                        Box(
+                            modifier = Modifier
+                                .size(3.dp)
+                                .background(textSecondary.copy(alpha = 0.3f), CircleShape)
+                        )
                         Text(
                             text = GlobalValue.weather,
-                            fontSize = 15.sp,
+                            fontSize = 13.sp,
                             color = textSecondary
                         )
                     }
@@ -122,21 +140,26 @@ class CreateScreen(val journal: Journal? = null): Screen {
                                 Notification.notificationState?.error("操作失败 -> ${e.message}")
                             }
                         },
-                        modifier = Modifier.size(44.dp)
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                color = primaryColor.copy(alpha = 0.12f),
+                                shape = CircleShape
+                            )
                     ) {
                         Icon(
                             Icons.Default.Check,
                             contentDescription = null,
                             tint = primaryColor,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
 
                 // 分割线
                 HorizontalDivider(
-                    color = dividerColor,
-                    thickness = 1.5.dp
+                    color = dividerColor.copy(alpha = 0.5f),
+                    thickness = 0.5.dp
                 )
             }
 
@@ -146,92 +169,106 @@ class CreateScreen(val journal: Journal? = null): Screen {
                     .weight(1f)
                     .padding(horizontal = 16.dp)
             ) {
-                // 标题输入
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 标题输入区域 - 固定高度
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(50.dp)
-                        .padding(horizontal = 5.dp)
+                        .height(52.dp)
                 ) {
                     BasicTextField(
                         value = title,
-                        modifier = Modifier.align(Alignment.CenterStart),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterStart),
                         onValueChange = { title = it },
                         singleLine = true,
                         textStyle = LocalTextStyle.current.copy(
-                            fontSize = 28.sp,
+                            fontSize = 26.sp,
                             fontWeight = FontWeight.Bold,
-                            color = textPrimary,
-                            lineHeight = 32.sp
+                            color = textPrimary
                         ),
                         cursorBrush = SolidColor(primaryColor),
                         decorationBox = { innerTextField ->
-                            if (title.isEmpty()) {
-                                Text(
-                                    text = "标题",
-                                    fontSize = 28.sp,
-                                    color = textTertiary,
-                                    fontWeight = FontWeight.Normal,
-                                    lineHeight = 32.sp,
-                                    textAlign = TextAlign.Center
-                                )
+                            Box(modifier = Modifier.fillMaxWidth()) {
+                                if (title.isEmpty()) {
+                                    Text(
+                                        text = "标题",
+                                        fontSize = 26.sp,
+                                        color = textTertiary,
+                                        fontWeight = FontWeight.Normal
+                                    )
+                                }
+                                innerTextField()
                             }
-                            innerTextField()
                         }
                     )
                 }
 
+                Spacer(modifier = Modifier.height(12.dp))
 
-                // 标题下分割线
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(primaryColor)
-                )
-
-                Spacer(modifier = Modifier.height(3.dp))
+                // 装饰性分割线
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .background(primaryColor, shape = CircleShape)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(1.5.dp)
+                            .background(
+                                brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                    colors = listOf(
+                                        primaryColor.copy(alpha = 0.6f),
+                                        primaryColor.copy(alpha = 0.1f)
+                                    )
+                                )
+                            )
+                    )
+                }
 
                 // 内容编辑区域
+                LaunchedEffect(content) {
+                    scrollState.animateScrollTo(scrollState.maxValue)
+                }
+
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .background(Color.Transparent)
+                        .fillMaxSize()
+                        .padding(top = 4.dp)
+                        .background(
+                            color = primaryColor.copy(alpha = 0.02f),
+                            shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                        )
                 ) {
-                    LaunchedEffect(content) {
-                        scrollState.animateScrollTo(scrollState.maxValue)
-                    }
-
                     BasicTextField(
                         value = content,
                         onValueChange = { content = it },
                         textStyle = TextStyle(
                             fontSize = 16.sp,
                             color = textPrimary,
-                            fontWeight = FontWeight.Normal
+                            lineHeight = 24.sp
                         ),
                         cursorBrush = SolidColor(primaryColor),
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(4.dp),
                         decorationBox = { innerTextField ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(vertical = 8.dp),
-                            ) {
-                                if (content.isEmpty()) {
-                                    Text(
-                                        text = "写点什么...",
-                                        color = textTertiary,
-                                        style = TextStyle(
-                                            fontSize = 16.sp,
-                                            color = textPrimary,
-                                            fontWeight = FontWeight.Normal,
-                                        ),
-                                    )
-                                }
-                                innerTextField()
+                            if (content.isEmpty()) {
+                                Text(
+                                    text = "写点什么...",
+                                    color = textTertiary,
+                                    fontSize = 16.sp
+                                )
                             }
+                            innerTextField()
                         }
                     )
                 }
