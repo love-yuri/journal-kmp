@@ -55,6 +55,10 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
+            /* xml */
+            implementation(libs.core)
+            implementation(libs.serialization)
+
             /* sqldelight flow extensions */
             implementation(libs.coroutines.extensions)
 

@@ -13,6 +13,7 @@ androidx-testExt = "1.2.1"
 composeHotReload = "1.0.0-beta04"
 composeMultiplatform = "1.8.2"
 converterKotlinxSerialization = "3.0.0"
+core = "0.91.2"
 junit = "4.13.2"
 kotlin = "2.2.20"
 kotlinLogging = "7.0.13"
@@ -33,6 +34,7 @@ androidx-material-icons-extended = { module = "androidx.compose.material:materia
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 ch-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassicVersion" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
+core = { module = "io.github.pdvrieze.xmlutil:core", version.ref = "core" }
 coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "nativeDriver" }
 kotlin-logging = { module = "io.github.oshai:kotlin-logging", version.ref = "kotlinLogging" }
 kotlin-logging-android = { module = "io.github.oshai:kotlin-logging-android", version.ref = "kotlinLogging" }
@@ -52,6 +54,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "nativeDriver" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 runtime = { module = "app.cash.sqldelight:runtime", version.ref = "nativeDriver" }
+serialization = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "core" }
 sqlite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "nativeDriver" }
 voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyagerVersion" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyagerVersion" }
