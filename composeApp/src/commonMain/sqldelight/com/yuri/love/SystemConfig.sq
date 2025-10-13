@@ -1,0 +1,7 @@
+CREATE TABLE SystemConfig (
+    key TEXT PRIMARY KEY NOT NULL ,
+    value TEXT
+);
+
+get: SELECT value FROM SystemConfig WHERE key = ?;
+set: INSERT OR REPLACE INTO SystemConfig VALUES (?, ?);
