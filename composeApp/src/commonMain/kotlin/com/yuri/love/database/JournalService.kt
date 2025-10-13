@@ -30,6 +30,8 @@ object JournalService {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val _journals = MutableStateFlow<List<Journal>>(emptyList())
     val journals: StateFlow<List<Journal>> = _journals.asStateFlow()
+    private val factory by lazy { DriverFactory.create() }
+    val filePath get() = factory.path(JournalDatabaseName)
     private val log = logger {}
     var info: JournalInfo = JournalInfo(
         total = 0,
@@ -37,8 +39,8 @@ object JournalService {
     )
         private set
 
-    private val query: JournalQueries by lazy {
-        val driver = DriverFactory.create().createDriver(JournalDatabaseName)
+    val query: JournalQueries by lazy {
+        val driver = factory.createDriver(JournalDatabaseName)
         Database(driver).journalQueries
     }
 
