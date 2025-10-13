@@ -10,11 +10,9 @@ import com.yuri.love.database.DriverFactory
 
 @OptIn(ExperimentalMultiplatform::class)
 actual object Static {
-    init {
+    actual fun init() {
         System.setProperty("kotlin-logging-to-android-native", "true")
     }
-
-    actual fun init() = Unit
 }
 
 class MainActivity : ComponentActivity() {

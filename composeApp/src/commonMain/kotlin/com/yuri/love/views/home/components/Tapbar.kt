@@ -39,8 +39,9 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun TapBar(scope: CoroutineScope, drawerState: DrawerState) {
+fun TapBar() {
     val navigator = LocalNavigator.currentOrThrow
+    val drawerController = LocalDrawerController.current
     Box( modifier = Modifier.fillMaxWidth().height(50.dp)) {
         Box(
             modifier = Modifier
@@ -58,9 +59,7 @@ fun TapBar(scope: CoroutineScope, drawerState: DrawerState) {
                         interactionSource = remember { MutableInteractionSource() },
                         indication = LocalIndication.current,
                         onClick = {
-                            scope.launch {
-                                drawerState.open()
-                            }
+                            drawerController.open()
                         }
                     ),
                 contentAlignment = Alignment.Center

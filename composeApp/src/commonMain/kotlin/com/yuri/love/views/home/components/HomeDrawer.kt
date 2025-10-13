@@ -26,8 +26,23 @@ import com.yuri.love.share.GlobalFonts
 import com.yuri.love.utils.platformSafeTopPadding
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.avatar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.painterResource
+
+val LocalDrawerController = staticCompositionLocalOf<DrawerController> {
+    error("No DrawerController provided")
+}
+
+class DrawerController(
+    private val drawerState: DrawerState,
+    private val scope: CoroutineScope
+) {
+    fun open() = scope.launch { drawerState.open() }
+    fun close() = scope.launch { drawerState.close() }
+}
+
 
 data class EnhancedDrawerMenuItem(
     val title: String,
@@ -40,7 +55,7 @@ data class EnhancedDrawerMenuItem(
 
 @Preview
 @Composable
-fun LovelyEnhancedDrawer(onCloseDrawer: () -> Unit = {}) {
+fun HomeDrawer(onCloseDrawer: () -> Unit = {}) {
     val drawerItems = listOf(
         EnhancedDrawerMenuItem("Home", Icons.Outlined.Home, Icons.Filled.Home, true),
         EnhancedDrawerMenuItem("Discover", Icons.Outlined.Explore, Icons.Filled.Explore, hasNewContent = true),
