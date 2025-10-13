@@ -15,6 +15,11 @@ actual class DriverFactory(private val context: Context) {
     actual companion object {
         @SuppressLint("StaticFieldLeak")
         var context: Context? = null
+
         actual fun create(): DriverFactory = DriverFactory(context!!)
+    }
+
+    actual fun path(name: String): String {
+        return context.getDatabasePath("$name.$DatabaseSuffix")?.path ?: ""
     }
 }
