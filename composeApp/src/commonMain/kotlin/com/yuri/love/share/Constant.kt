@@ -11,6 +11,11 @@ const val DatabaseSuffix: String = "db"
 const val JournalDatabaseName: String = "journal"
 
 /**
+ * 系统配置数据库名称
+ */
+const val SystemConfigDatabaseName: String = "system_config"
+
+/**
  * 天气的api
  */
 const val WeatherApiKey: String = "S4gOH8lQuBXpjpLGv"
