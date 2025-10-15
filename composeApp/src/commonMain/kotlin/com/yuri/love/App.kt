@@ -19,6 +19,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.yuri.love.retrofit.initCurrentWeather
 import com.yuri.love.share.GlobalColors
+import com.yuri.love.share.GlobalValue
 import com.yuri.love.utils.notification.NotificationContainer
 import com.yuri.love.utils.platformSafeTopPadding
 import com.yuri.love.views.home.HomeScreen
@@ -60,6 +61,7 @@ fun App() {
                         Navigator(
                             screen = HomeScreen(),
                         ) { navigator ->
+                            GlobalValue.bindNavigator(navigator)
                             SlideTransition(navigator)
                         }
                         NotificationContainer(

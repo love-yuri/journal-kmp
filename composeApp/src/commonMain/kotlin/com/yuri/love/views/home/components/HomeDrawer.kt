@@ -21,9 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
 import com.yuri.love.database.JournalService
 import com.yuri.love.share.GlobalFonts
+import com.yuri.love.share.GlobalValue
 import com.yuri.love.utils.platformSafeTopPadding
+import com.yuri.love.views.home.HomeScreen
+import com.yuri.love.views.home.TestScreen
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.avatar
 import kotlinx.coroutines.CoroutineScope
@@ -108,7 +112,12 @@ fun HomeDrawer(onCloseDrawer: () -> Unit = {}) {
                     val item = drawerItems[index]
                     EnhancedDrawerItem(
                         item = item,
-                        onClick = onCloseDrawer
+                        onClick = {
+                            when (index) {
+                                1 -> GlobalValue.push(TestScreen())
+                            }
+                            onCloseDrawer()
+                        }
                     )
                 }
             }
