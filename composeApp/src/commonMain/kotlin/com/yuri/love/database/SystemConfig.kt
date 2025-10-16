@@ -23,6 +23,14 @@ object SystemConfig {
         get () = get(WEBDAV_PASSWORD)
         set (value) = set(WEBDAV_PASSWORD, value)
 
+    /**
+     * 是否登录
+     */
+    var isLoggedIn: Boolean
+        get() = get("isLoggedIn").toBoolean()
+        set(value) = set("isLoggedIn", value)
+
+
     private val query: SystemConfigQueries by lazy {
         val driver = DriverFactory.create().createDriver(SystemConfigDatabaseName)
         Database(driver).systemConfigQueries

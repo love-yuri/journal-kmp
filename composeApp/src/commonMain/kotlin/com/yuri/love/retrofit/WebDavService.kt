@@ -18,6 +18,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -84,14 +85,14 @@ object WebDavService {
     /**
      * 获取数据库文件所在目录
      */
-    suspend fun dir(): List<WebdavFile> {
+    suspend fun dir(path: String = "dav/$DB_FOLDER"): List<WebdavFile> {
         if (account.isNullOrEmpty() || password.isNullOrEmpty()) {
             throw Exception("account or password is empty")
         }
 
         try {
             val response = service.dir(
-                "dav/$DB_FOLDER",
+                path,
                 "Basic ${Base64.encode("$account:$password".encodeToByteArray())}",
                 "text/xml"
             )
@@ -187,10 +188,10 @@ object WebDavService {
     data class WebdavFile(
         var isFile: Boolean = true,
         var isFolder: Boolean = false,
-        var path: String? = null,
+        var path: String,
         var parent: String? = null,
-        var children: List<WebdavFile>? = null,
-        var fileName: String? = null
+        var children: MutableList<WebdavFile>? = null,
+        var fileName: String
     )
 
     /**
@@ -207,7 +208,7 @@ object WebDavService {
     @XmlSerialName("response", "DAV:", "d")
     data class ResponseItem(
         @XmlElement(true)
-        val href: String? = null,
+        val href: String,
 
         @XmlElement(true)
         val propstat: List<PropStat>? = null
@@ -226,7 +227,7 @@ object WebDavService {
         @XmlElement(true)
         val getcontenttype: String? = null,
         @XmlElement(true)
-        val displayname: String? = null,
+        val displayname: String,
         @XmlElement(true)
         val getcontentlength: String? = null,
         @XmlElement(true)
@@ -259,14 +260,12 @@ object WebDavService {
         val xmlClean = this.trimStart('\uFEFF', '\n', '\r', ' ', '\t')
         val multi = xml.decodeFromString<MultiStatus>(xmlClean)
 
-        log.info { multi }
-
         return multi.response.mapNotNull { resp ->
             val prop = resp.propstat?.firstOrNull()?.prop ?: return@mapNotNull null
             val isFolder = prop.resourcetype?.collection != null
             WebdavFile(
                 path = resp.href,
-                fileName = prop.displayname ?: resp.href?.substringAfterLast("/"),
+                fileName = prop.displayname,
                 isFolder = isFolder,
                 isFile = !isFolder,
             )

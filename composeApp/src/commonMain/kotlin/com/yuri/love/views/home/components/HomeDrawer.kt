@@ -28,6 +28,7 @@ import com.yuri.love.share.GlobalValue
 import com.yuri.love.utils.platformSafeTopPadding
 import com.yuri.love.views.home.HomeScreen
 import com.yuri.love.views.home.TestScreen
+import com.yuri.love.views.webdav.WebdavScreen
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.avatar
 import kotlinx.coroutines.CoroutineScope
@@ -62,7 +63,7 @@ data class EnhancedDrawerMenuItem(
 fun HomeDrawer(onCloseDrawer: () -> Unit = {}) {
     val drawerItems = listOf(
         EnhancedDrawerMenuItem("Home", Icons.Outlined.Home, Icons.Filled.Home, true),
-        EnhancedDrawerMenuItem("Discover", Icons.Outlined.Explore, Icons.Filled.Explore, hasNewContent = true),
+        EnhancedDrawerMenuItem("Webdav", Icons.Outlined.Explore, Icons.Filled.Explore, hasNewContent = true),
         EnhancedDrawerMenuItem("Matches", Icons.Outlined.Favorite, Icons.Filled.Favorite, badge = 3),
         EnhancedDrawerMenuItem("Profile", Icons.Outlined.Person, Icons.Filled.Person),
         EnhancedDrawerMenuItem("Settings", Icons.Outlined.Settings, Icons.Filled.Settings)
@@ -114,7 +115,7 @@ fun HomeDrawer(onCloseDrawer: () -> Unit = {}) {
                         item = item,
                         onClick = {
                             when (index) {
-                                1 -> GlobalValue.push(TestScreen())
+                                1 -> GlobalValue.push(WebdavScreen())
                             }
                             onCloseDrawer()
                         }
