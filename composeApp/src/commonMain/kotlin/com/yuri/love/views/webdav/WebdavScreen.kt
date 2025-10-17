@@ -1,7 +1,5 @@
 package com.yuri.love.views.webdav
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.InsertDriveFile
 import androidx.compose.material.icons.automirrored.outlined.Login
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,9 +31,9 @@ import com.yuri.love.retrofit.WebDavService.WebdavFile
 import com.yuri.love.share.WebDavConfig
 import com.yuri.love.share.WebDavConfig.DEFAULT_PATH
 import io.github.oshai.kotlinlogging.KotlinLogging.logger
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
-import kotlin.collections.listOf
 
 data class WebdavConfig(
     var serverUrl: String = "",
@@ -56,7 +54,6 @@ class WebdavScreen : Screen {
 // 现代配色方案
 object ModernColors {
     val Primary = Color(0xFF6C63FF)
-    val PrimaryLight = Color(0xFF8B85FF)
     val Secondary = Color(0xFFFF6584)
     val Background = Color(0xFFF8F9FA)
     val Surface = Color(0xFFFFFFFF)
@@ -65,7 +62,6 @@ object ModernColors {
     val BorderLight = Color(0xFFE8EAED)
     val Success = Color(0xFF00B894)
     val Gradient1 = listOf(Color(0xFF6C63FF), Color(0xFF8B85FF))
-    val Gradient2 = listOf(Color(0xFFFF6584), Color(0xFFFF8A9B))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -188,7 +184,7 @@ fun ModernWebdavScreen() {
                     }
                 },
                 onLogout = {
-                    webdavConfig = WebdavConfig()
+                    webdavConfig.isLoggedIn = false
                     currentFiles = emptyList()
                     currentPath = "/"
                     showLoginDialog = false
@@ -616,7 +612,7 @@ fun ModernFileItem(
 
     LaunchedEffect(isPressed) {
         if (isPressed) {
-            kotlinx.coroutines.delay(100)
+            delay(100)
             isPressed = false
         }
     }
@@ -723,7 +719,7 @@ fun ModernLoginDialog(
                             contentColor = Color(0xFFE74C3C)
                         )
                     ) {
-                        Icon(Icons.Outlined.Logout, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Outlined.Logout, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("断开连接", fontWeight = FontWeight.SemiBold)
                     }
@@ -859,7 +855,7 @@ fun ModernTextField(
                 androidx.compose.ui.text.input.PasswordVisualTransformation()
             else
                 androidx.compose.ui.text.input.VisualTransformation.None,
-            modifier = Modifier.fillMaxWidth().height(50.dp),
+            modifier = Modifier.fillMaxWidth().height(60.dp),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = ModernColors.Primary,
