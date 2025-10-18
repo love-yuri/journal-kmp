@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.InsertDriveFile
 import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.automirrored.outlined.Logout
@@ -22,12 +23,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.navigator.Navigator
 import com.yuri.love.database.SystemConfig
 import com.yuri.love.retrofit.WebDavService
 import com.yuri.love.retrofit.WebDavService.WebdavFile
+import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.WebDavConfig
 import com.yuri.love.share.WebDavConfig.DEFAULT_PATH
 import io.github.oshai.kotlinlogging.KotlinLogging.logger
@@ -64,7 +70,7 @@ object ModernColors {
     val Gradient1 = listOf(Color(0xFF6C63FF), Color(0xFF8B85FF))
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, InternalVoyagerApi::class)
 @Composable
 fun ModernWebdavScreen() {
     var webdavConfig by remember {
@@ -102,6 +108,9 @@ fun ModernWebdavScreen() {
                         currentFiles = WebDavService.dir(currentPath).drop(1)
                         isLoading = false
                     }
+                },
+                onBackClick = {
+                    GlobalValue.navigatorManager.pop()
                 }
             )
 
@@ -210,7 +219,10 @@ fun ModernWebdavScreen() {
 fun ModernTopBar(
     isLoggedIn: Boolean,
     onLoginClick: () -> Unit,
-    onRefreshClick: () -> Unit
+    onRefreshClick: () -> Unit,
+    onBackClick: (() -> Unit)? = null, // 可选的返回按钮
+    title: String = "WebDAV",
+    subtitle: String? = null // 可选的自定义副标题
 ) {
     Box(
         modifier = Modifier
@@ -218,37 +230,74 @@ fun ModernTopBar(
             .background(
                 Brush.horizontalGradient(ModernColors.Gradient1)
             )
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .statusBarsPadding()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    text = "WebDAV",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = if (isLoggedIn) "已连接 ✓" else "未连接",
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.9f)
-                )
+            // 左侧：返回按钮 + 标题
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // 返回按钮
+                if (onBackClick != null) {
+                    ModernIconButton(
+                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        onClick = onBackClick,
+                        contentDescription = "返回",
+                        tint = Color.White
+                    )
+                }
+
+                // 标题区域
+                Column(
+                    modifier = Modifier.weight(1f, fill = false)
+                ) {
+                    Text(
+                        text = title,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    // 状态或副标题
+                    Text(
+                        text = subtitle ?: if (isLoggedIn) "已连接 ✓" else "未连接",
+                        fontSize = 13.sp,
+                        color = Color.White.copy(alpha = 0.85f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // 右侧：操作按钮
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 if (isLoggedIn) {
                     ModernIconButton(
                         icon = Icons.Outlined.Refresh,
-                        onClick = onRefreshClick
+                        onClick = onRefreshClick,
+                        contentDescription = "刷新",
+                        tint = Color.White
                     )
                 }
+
                 ModernIconButton(
                     icon = if (isLoggedIn) Icons.Outlined.Settings else Icons.AutoMirrored.Outlined.Login,
-                    onClick = onLoginClick
+                    onClick = onLoginClick,
+                    contentDescription = if (isLoggedIn) "设置" else "登录",
+                    tint = Color.White
                 )
             }
         }
@@ -258,21 +307,22 @@ fun ModernTopBar(
 @Composable
 fun ModernIconButton(
     icon: ImageVector,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+    tint: Color = Color.White,
+    enabled: Boolean = true
 ) {
-    Box(
-        modifier = Modifier
-            .size(44.dp)
-            .clip(CircleShape)
-            .background(Color.White.copy(alpha = 0.2f))
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+    IconButton(
+        onClick = onClick,
+        modifier = modifier.size(40.dp),
+        enabled = enabled
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(22.dp)
+            contentDescription = contentDescription,
+            tint = if (enabled) tint else tint.copy(alpha = 0.5f),
+            modifier = Modifier.size(24.dp)
         )
     }
 }

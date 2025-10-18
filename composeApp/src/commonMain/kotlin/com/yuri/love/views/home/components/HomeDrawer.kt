@@ -21,20 +21,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.yuri.love.database.JournalService
 import com.yuri.love.share.GlobalFonts
 import com.yuri.love.share.GlobalValue
+import com.yuri.love.share.NavigatorManager
+import com.yuri.love.share.NavigatorManager.drawerItems
 import com.yuri.love.utils.platformSafeTopPadding
 import com.yuri.love.views.home.HomeScreen
-import com.yuri.love.views.home.TestScreen
+import com.yuri.love.views.test.TestScreen
 import com.yuri.love.views.webdav.WebdavScreen
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.avatar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import nl.adaptivity.xmlutil.core.impl.multiplatform.name
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.painterResource
+import kotlin.reflect.KClass
 
 val LocalDrawerController = staticCompositionLocalOf<DrawerController> {
     error("No DrawerController provided")
@@ -48,26 +54,10 @@ class DrawerController(
     fun close() = scope.launch { drawerState.close() }
 }
 
-
-data class EnhancedDrawerMenuItem(
-    val title: String,
-    val icon: ImageVector,
-    val filledIcon: ImageVector,
-    val isSelected: Boolean = false,
-    val badge: Int? = null,
-    val hasNewContent: Boolean = false
-)
-
 @Preview
 @Composable
 fun HomeDrawer(onCloseDrawer: () -> Unit = {}) {
-    val drawerItems = listOf(
-        EnhancedDrawerMenuItem("Home", Icons.Outlined.Home, Icons.Filled.Home, true),
-        EnhancedDrawerMenuItem("Webdav", Icons.Outlined.Explore, Icons.Filled.Explore, hasNewContent = true),
-        EnhancedDrawerMenuItem("Matches", Icons.Outlined.Favorite, Icons.Filled.Favorite, badge = 3),
-        EnhancedDrawerMenuItem("Profile", Icons.Outlined.Person, Icons.Filled.Person),
-        EnhancedDrawerMenuItem("Settings", Icons.Outlined.Settings, Icons.Filled.Settings)
-    )
+    val currentPageType by NavigatorManager.currentPageType.collectAsState()
 
     Box(
         modifier = Modifier
@@ -114,11 +104,10 @@ fun HomeDrawer(onCloseDrawer: () -> Unit = {}) {
                     EnhancedDrawerItem(
                         item = item,
                         onClick = {
-                            when (index) {
-                                1 -> GlobalValue.push(WebdavScreen())
-                            }
+                            GlobalValue.navigatorManager.push(item.key)
                             onCloseDrawer()
-                        }
+                        },
+                        currentPageType
                     )
                 }
             }
@@ -338,14 +327,18 @@ private fun StatCard(label: String, value: String, modifier: Modifier = Modifier
 }
 @Composable
 private fun EnhancedDrawerItem(
-    item: EnhancedDrawerMenuItem,
-    onClick: () -> Unit
+    item: NavigatorManager.EnhancedDrawerMenuItem,
+    onClick: () -> Unit,
+    currentPageType: NavigatorManager.ScreenPageType
 ) {
+
+    val isSelected = currentPageType == item.key
+
     Surface(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         color = when {
-            item.isSelected -> Brush.horizontalGradient(
+            isSelected -> Brush.horizontalGradient(
                 listOf(
                     Color(0x30FF6B9D),
                     Color(0x20D946EF)
@@ -361,7 +354,7 @@ private fun EnhancedDrawerItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 左侧装饰条
-            if (item.isSelected) {
+            if (isSelected) {
                 Box(
                     modifier = Modifier
                         .width(4.dp)
@@ -383,15 +376,15 @@ private fun EnhancedDrawerItem(
                 Text(
                     text = item.title,
                     fontSize = 17.sp,
-                    fontWeight = if (item.isSelected) FontWeight.Bold else FontWeight.Medium,
-                    color = if (item.isSelected) Color(0xFF2D1B35) else Color(0xFF4A5568),
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                    color = if (isSelected) Color(0xFF2D1B35) else Color(0xFF4A5568),
                     letterSpacing = 0.3.sp
                 )
             }
 
             // 右侧指示器
             when {
-                item.isSelected -> {
+                isSelected -> {
                     Box(
                         modifier = Modifier
                             .size(10.dp)
