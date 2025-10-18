@@ -28,14 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.navigator.Navigator
 import com.yuri.love.database.SystemConfig
 import com.yuri.love.retrofit.WebDavService
 import com.yuri.love.retrofit.WebDavService.WebdavFile
 import com.yuri.love.share.GlobalValue
-import com.yuri.love.share.WebDavConfig
-import com.yuri.love.share.WebDavConfig.DEFAULT_PATH
 import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -75,7 +71,7 @@ object ModernColors {
 fun ModernWebdavScreen() {
     var webdavConfig by remember {
         mutableStateOf(WebdavConfig (
-            serverUrl = WebDavConfig.HOST,
+            serverUrl = WebDavService.HOST,
             username = SystemConfig.webdav_account ?: "",
             password = SystemConfig.webdav_password ?: "",
             isLoggedIn = SystemConfig.isLoggedIn
@@ -83,14 +79,14 @@ fun ModernWebdavScreen() {
     }
 
     var currentFiles by remember { mutableStateOf<List<WebdavFile>>(emptyList()) }
-    var currentPath by remember { mutableStateOf(DEFAULT_PATH) }
+    var currentPath by remember { mutableStateOf(WebDavService.DEFAULT_PATH) }
     var showLoginDialog by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        currentFiles = WebDavService.dir(DEFAULT_PATH).drop(1)
+        currentFiles = WebDavService.dir(WebDavService.DEFAULT_PATH).drop(1)
     }
 
     Box(
@@ -180,7 +176,7 @@ fun ModernWebdavScreen() {
                                 password = password,
                                 isLoggedIn = true
                             )
-                            currentFiles = WebDavService.dir(DEFAULT_PATH).drop(1)
+                            currentFiles = WebDavService.dir(WebDavService.DEFAULT_PATH).drop(1)
                             showLoginDialog = false
                             isLoading = false
                             SystemConfig.isLoggedIn = true
@@ -779,7 +775,7 @@ fun ModernLoginDialog(
                         value = serverUrl,
                         onValueChange = { serverUrl = it },
                         label = "服务器地址",
-                        placeholder = WebDavConfig.HOST,
+                        placeholder = WebDavService.HOST,
                         leadingIcon = Icons.Outlined.Cloud
                     )
 
