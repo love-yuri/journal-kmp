@@ -25,21 +25,16 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import com.yuri.love.Journal
 import com.yuri.love.database.JournalService
-import com.yuri.love.retrofit.WebDavService
 import com.yuri.love.share.GlobalColors
 import com.yuri.love.utils.platformSafeTopPadding
 import com.yuri.love.views.home.components.DiaryHeaderAdvanced
 import com.yuri.love.views.home.components.JournalCardComposable
 import com.yuri.love.views.home.components.TapBar
-import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import java.io.File
-
-val log = logger {}
 
 /**
  * 主页 - 优化启动体验版本
@@ -49,7 +44,6 @@ class HomeScreen: Screen {
     override fun Content() {
         // 收集StateFlow状态
         val journals by JournalService.journals.collectAsState()
-
         CreateHome(journals)
     }
 }
