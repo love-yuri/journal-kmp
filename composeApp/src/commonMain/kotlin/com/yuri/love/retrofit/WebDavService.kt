@@ -1,8 +1,6 @@
 package com.yuri.love.retrofit
 
 import com.yuri.love.database.SystemConfig
-import com.yuri.love.share.WebDavConfig
-import com.yuri.love.share.WebDavConfig.DB_FOLDER
 import com.yuri.love.share.json
 import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.serialization.Serializable
@@ -12,7 +10,6 @@ import nl.adaptivity.xmlutil.serialization.DefaultXmlSerializationPolicy
 import nl.adaptivity.xmlutil.serialization.XML
 import nl.adaptivity.xmlutil.serialization.XmlElement
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
-import nl.adaptivity.xmlutil.serialization.XmlSerializationPolicy
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
@@ -35,9 +32,14 @@ import java.io.FileOutputStream
 import kotlin.io.encoding.Base64
 
 object WebDavService {
+    const val HOST = "https://dav.jianguoyun.com/"
+    const val DEFAULT_PATH = "dav/" // 默认路径
+    const val DB_FOLDER = "journal" // 数据库上传的文件夹名称
+
     private val log = logger {}
     private val account get() = SystemConfig.webdav_account
     private val password get() = SystemConfig.webdav_password
+
     private val service: WebDavService by lazy {
         retrofit.create(WebDavService::class.java)
     }
@@ -77,7 +79,7 @@ object WebDavService {
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(WebDavConfig.HOST)
+            .baseUrl(HOST)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
     }
