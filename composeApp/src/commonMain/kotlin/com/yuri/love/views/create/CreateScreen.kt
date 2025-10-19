@@ -7,7 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.yuri.love.Journal
+import com.yuri.love.components.ModernIconButton
 import com.yuri.love.database.JournalService
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.utils.TimeUtils
@@ -82,22 +83,13 @@ class CreateScreen(val journal: Journal? = null): Screen {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
+
+                    ModernIconButton(
+                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
                         onClick = { navigator?.pop() },
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                color = textPrimary.copy(alpha = 0.05f),
-                                shape = CircleShape
-                            )
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = textPrimary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
+                        contentDescription = "返回",
+                        tint = primaryColor
+                    )
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -127,7 +119,8 @@ class CreateScreen(val journal: Journal? = null): Screen {
                         )
                     }
 
-                    IconButton(
+                    ModernIconButton(
+                        icon = Icons.Default.Check,
                         onClick = {
                             try {
                                 if (isUpdate) {
@@ -140,20 +133,10 @@ class CreateScreen(val journal: Journal? = null): Screen {
                                 Notification.notificationState?.error("操作失败 -> ${e.message}")
                             }
                         },
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                color = primaryColor.copy(alpha = 0.12f),
-                                shape = CircleShape
-                            )
-                    ) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = null,
-                            tint = primaryColor,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
+                        contentDescription = "确认",
+                        tint = primaryColor
+                    )
+
                 }
 
                 // 分割线
