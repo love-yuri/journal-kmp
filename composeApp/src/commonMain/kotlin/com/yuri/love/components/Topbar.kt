@@ -5,13 +5,20 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -26,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.yuri.love.share.GlobalColors
+import com.yuri.love.share.GlobalValue
 import com.yuri.love.views.create.CreateScreen
 import com.yuri.love.views.home.components.LocalDrawerController
 import journal.composeapp.generated.resources.Res
@@ -92,5 +100,25 @@ fun TopBar() {
                 )
             }
         }
+    }
+}
+
+@Composable
+fun SimpleTopBar() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        ModernIconButton(
+            icon = Icons.AutoMirrored.Outlined.ArrowBack,
+            onClick = { GlobalValue.navigatorManager.pop() },
+            contentDescription = "返回",
+            tint = Color(0xFFFFB6C1)
+        )
     }
 }
