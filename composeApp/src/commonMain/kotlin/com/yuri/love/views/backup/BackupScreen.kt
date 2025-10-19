@@ -12,7 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import com.yuri.love.components.TopBar
+import com.yuri.love.components.SimpleTopBar
+import com.yuri.love.database.JournalService
 import com.yuri.love.database.SystemConfig
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.NavigatorManager
@@ -28,7 +29,7 @@ class BackupScreen : Screen {
         var statusMessage by remember { mutableStateOf("") }
 
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-            TopBar()
+            SimpleTopBar()
 
             BackupScreenContent(
                 onBackupClick = { showBackupDialog = true },
@@ -54,8 +55,8 @@ class BackupScreen : Screen {
                     showBackupDialog = false
                     isLoading = true
 
-                    localBackup()
-                    webdavBackup()
+                    JournalService.localBackup()
+                    JournalService.webdavBackup()
 
                     statusMessage = when (backupType) {
                         BackupType.LOCAL -> "本地备份成功"
@@ -100,20 +101,6 @@ class BackupScreen : Screen {
             )
         }
     }
-}
-
-/**
- * 本地备份
- */
-private fun localBackup() {
-
-}
-
-/**
- * webdav备份
- */
-private fun webdavBackup() {
-    TODO("Not yet implemented")
 }
 
 enum class BackupType {
