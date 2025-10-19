@@ -30,6 +30,8 @@ object SystemConfig {
         get() = get("isLoggedIn").toBoolean()
         set(value) = set("isLoggedIn", value)
 
+    val start_time: Long get() = get("start_time")!!.toLong()
+
 
     private val query: SystemConfigQueries by lazy {
         val driver = DriverFactory.create().createDriver(SystemConfigDatabaseName)

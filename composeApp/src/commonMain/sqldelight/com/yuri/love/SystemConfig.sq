@@ -3,5 +3,10 @@ CREATE TABLE SystemConfig (
     value TEXT
 );
 
+INSERT OR IGNORE INTO SystemConfig (key, value)
+VALUES
+    ('app_version', '1.0.0'),
+    ('start_time', datetime('now', 'localtime'));
+
 get: SELECT value FROM SystemConfig WHERE key = ?;
 set: INSERT OR REPLACE INTO SystemConfig VALUES (?, ?);
