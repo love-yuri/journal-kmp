@@ -28,9 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
+import com.yuri.love.components.ModernIconButton
 import com.yuri.love.database.SystemConfig
 import com.yuri.love.retrofit.WebDavService
 import com.yuri.love.retrofit.WebDavService.WebdavFile
+import com.yuri.love.share.GlobalColors
 import com.yuri.love.share.GlobalValue
 import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.coroutines.delay
@@ -44,8 +46,6 @@ data class WebdavConfig(
     var isLoggedIn: Boolean = false
 )
 
-private val log = logger {}
-
 class WebdavScreen : Screen {
     @Composable
     override fun Content() {
@@ -55,15 +55,18 @@ class WebdavScreen : Screen {
 
 // 现代配色方案
 object ModernColors {
-    val Primary = Color(0xFF6C63FF)
-    val Secondary = Color(0xFFFF6584)
-    val Background = Color(0xFFF8F9FA)
-    val Surface = Color(0xFFFFFFFF)
-    val TextPrimary = Color(0xFF2D3436)
-    val TextSecondary = Color(0xFF636E72)
-    val BorderLight = Color(0xFFE8EAED)
-    val Success = Color(0xFF00B894)
-    val Gradient1 = listOf(Color(0xFF6C63FF), Color(0xFF8B85FF))
+    val Primary = Color(0xFFFFB3C6)          // 柔和的粉色
+    val Secondary = Color(0xFFFFC9DE)        // 淡粉色
+    val Background = Color(0xFFFFFBFC)       // 极浅的粉白色
+    val Surface = Color(0xFFFFFFFF)          // 纯白
+    val TextPrimary = Color(0xFF4A4A4A)      // 柔和的深灰色
+    val TextSecondary = Color(0xFF9E9E9E)    // 淡灰色
+    val BorderLight = Color(0xFFFCE4EC)      // 粉白边框
+    val Success = Color(0xFF49DCC0)
+    val Gradient1 = listOf(
+        Color(0xFFFFE5EE),                    // 极淡粉
+        Color(0xFFFFF0F5)                     // 淡粉白
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, InternalVoyagerApi::class)
@@ -86,7 +89,9 @@ fun ModernWebdavScreen() {
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        currentFiles = WebDavService.dir(WebDavService.DEFAULT_PATH).drop(1)
+        if (webdavConfig.isLoggedIn) {
+            currentFiles = WebDavService.dir(WebDavService.DEFAULT_PATH).drop(1)
+        }
     }
 
     Box(
@@ -170,13 +175,15 @@ fun ModernWebdavScreen() {
                         isLoading = true
 
                         try {
+                            SystemConfig.webdav_account = username
+                            SystemConfig.webdav_password = password
+                            currentFiles = WebDavService.dir(WebDavService.DEFAULT_PATH).drop(1)
                             webdavConfig = WebdavConfig (
                                 serverUrl = url,
                                 username = username,
                                 password = password,
                                 isLoggedIn = true
                             )
-                            currentFiles = WebDavService.dir(WebDavService.DEFAULT_PATH).drop(1)
                             showLoginDialog = false
                             isLoading = false
                             SystemConfig.isLoggedIn = true
@@ -247,28 +254,29 @@ fun ModernTopBar(
                         icon = Icons.AutoMirrored.Outlined.ArrowBack,
                         onClick = onBackClick,
                         contentDescription = "返回",
-                        tint = Color.White
+                        tint = Color(0xFFEC4899)
                     )
                 }
 
                 // 标题区域
-                Column(
+                Row (
                     modifier = Modifier.weight(1f, fill = false)
                 ) {
                     Text(
                         text = title,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = Color(0xFFEC4899),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
 
                     // 状态或副标题
                     Text(
+                        modifier = Modifier.align(Alignment.CenterVertically).padding(start = 8.dp),
                         text = subtitle ?: if (isLoggedIn) "已连接 ✓" else "未连接",
                         fontSize = 13.sp,
-                        color = Color.White.copy(alpha = 0.85f),
+                        color = Color(0xFF66A84D),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -285,7 +293,7 @@ fun ModernTopBar(
                         icon = Icons.Outlined.Refresh,
                         onClick = onRefreshClick,
                         contentDescription = "刷新",
-                        tint = Color.White
+                        tint = Color(0xFFEC4899)
                     )
                 }
 
@@ -293,33 +301,10 @@ fun ModernTopBar(
                     icon = if (isLoggedIn) Icons.Outlined.Settings else Icons.AutoMirrored.Outlined.Login,
                     onClick = onLoginClick,
                     contentDescription = if (isLoggedIn) "设置" else "登录",
-                    tint = Color.White
+                    tint = Color(0xFFEC4899)
                 )
             }
         }
-    }
-}
-
-@Composable
-fun ModernIconButton(
-    icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    contentDescription: String? = null,
-    tint: Color = Color.White,
-    enabled: Boolean = true
-) {
-    IconButton(
-        onClick = onClick,
-        modifier = modifier.size(40.dp),
-        enabled = enabled
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = if (enabled) tint else tint.copy(alpha = 0.5f),
-            modifier = Modifier.size(24.dp)
-        )
     }
 }
 
@@ -614,13 +599,6 @@ fun ModernFileItem(
                         fontSize = 13.sp,
                         color = ModernColors.TextSecondary
                     )
-//                    file.modifiedDate?.let {
-//                        Text(
-//                            text = "• $it",
-//                            fontSize = 13.sp,
-//                            color = ModernColors.TextSecondary
-//                        )
-//                    }
                 }
             }
 

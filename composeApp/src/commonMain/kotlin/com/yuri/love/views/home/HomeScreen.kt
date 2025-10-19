@@ -29,7 +29,7 @@ import com.yuri.love.share.GlobalColors
 import com.yuri.love.utils.platformSafeTopPadding
 import com.yuri.love.views.home.components.DiaryHeaderAdvanced
 import com.yuri.love.views.home.components.JournalCardComposable
-import com.yuri.love.views.home.components.TapBar
+import com.yuri.love.components.TopBar
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -59,7 +59,7 @@ private fun CreateHome(journals: List<Journal>) {
             .platformSafeTopPadding()
     ) {
         // TapBar
-        TapBar()
+        TopBar()
 
         // 主内容区域
         Column(
