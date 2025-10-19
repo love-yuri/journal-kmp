@@ -1,4 +1,4 @@
-package com.yuri.love.views.home.components
+package com.yuri.love.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalIndication
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -26,20 +25,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.yuri.love.database.JournalService
 import com.yuri.love.share.GlobalColors
-import com.yuri.love.share.JournalDatabaseName
 import com.yuri.love.views.create.CreateScreen
-import io.github.oshai.kotlinlogging.KotlinLogging.logger
+import com.yuri.love.views.home.components.LocalDrawerController
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.kiss
 import journal.composeapp.generated.resources.more
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun TapBar() {
+fun TopBar() {
     val navigator = LocalNavigator.currentOrThrow
     val drawerController = LocalDrawerController.current
     Box( modifier = Modifier.fillMaxWidth().height(50.dp)) {
@@ -98,9 +93,4 @@ fun TapBar() {
             }
         }
     }
-}
-
-@Composable
-private fun OnClick() {
-
 }
