@@ -110,7 +110,7 @@ private fun NotificationComposable(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
             .fillMaxWidth(0.7f)
-            .height(58.dp)
+            .height(38.dp)
             .background(color = backgroundColor.copy(alpha = 0.95f))
     ) {
         Row(
