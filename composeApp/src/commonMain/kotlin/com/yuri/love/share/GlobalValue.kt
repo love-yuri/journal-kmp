@@ -1,8 +1,10 @@
 package com.yuri.love.share
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Yard
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,7 +12,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
+import com.yuri.love.views.backup.BackupScreen
 import com.yuri.love.views.home.HomeScreen
+import com.yuri.love.views.setting.SettingScreen
 import com.yuri.love.views.test.TestScreen
 import com.yuri.love.views.webdav.WebdavScreen
 import io.github.oshai.kotlinlogging.KotlinLogging.logger
@@ -27,6 +31,8 @@ object NavigatorManager {
         Home,
         Webdav,
         Test,
+        Backup,
+        Setting,
     }
 
     data class EnhancedDrawerMenuItem (
@@ -57,9 +63,9 @@ object NavigatorManager {
     val drawerItems = listOf (
         EnhancedDrawerMenuItem(ScreenPageType.Home,"所有日记", Icons.Outlined.Home, { HomeScreen() }),
         EnhancedDrawerMenuItem(ScreenPageType.Webdav,"Webdav网盘", Icons.Outlined.Explore, { WebdavScreen() }),
-//        EnhancedDrawerMenuItem("备份和恢复", Icons.Outlined.Favorite),
+        EnhancedDrawerMenuItem(ScreenPageType.Backup, "备份和恢复", Icons.Outlined.Backup, { BackupScreen() }),
         EnhancedDrawerMenuItem(ScreenPageType.Test, "测试页面", Icons.Outlined.Yard, { TestScreen() }),
-//        EnhancedDrawerMenuItem("系统设置", Icons.Outlined.Settings)
+        EnhancedDrawerMenuItem(ScreenPageType.Setting, "系统设置", Icons.Outlined.Settings, { SettingScreen() })
     )
 
     /**
