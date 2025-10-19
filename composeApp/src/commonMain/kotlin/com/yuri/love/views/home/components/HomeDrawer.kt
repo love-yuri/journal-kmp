@@ -23,11 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import com.yuri.love.JournalInfo
 import com.yuri.love.database.JournalService
+import com.yuri.love.database.SystemConfig
+import com.yuri.love.database.SystemConfig.get
 import com.yuri.love.share.GlobalFonts
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.NavigatorManager
 import com.yuri.love.share.NavigatorManager.drawerItems
+import com.yuri.love.utils.TimeUtils
 import com.yuri.love.utils.platformSafeTopPadding
 import com.yuri.love.views.home.HomeScreen
 import com.yuri.love.views.test.TestScreen
@@ -58,6 +62,7 @@ class DrawerController(
 @Composable
 fun HomeDrawer(onCloseDrawer: () -> Unit = {}) {
     val currentPageType by NavigatorManager.currentPageType.collectAsState()
+    val journalInfo = JournalService.JournalInfo.collectAsState()
 
     Box(
         modifier = Modifier
@@ -82,7 +87,7 @@ fun HomeDrawer(onCloseDrawer: () -> Unit = {}) {
                     bottom = 24.dp
                 )
         ) {
-            EnhancedDrawerHeader()
+            EnhancedDrawerHeader(journalInfo.value)
 
             // 导航菜单
             LazyColumn(
@@ -200,7 +205,7 @@ private fun EnhancedBackground() {
 }
 
 @Composable
-private fun EnhancedDrawerHeader() {
+private fun EnhancedDrawerHeader(journalInfo: JournalInfo) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -285,16 +290,16 @@ private fun EnhancedDrawerHeader() {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 val modifier = Modifier.weight(1f)
-                StatCard("总文章", JournalService.info.total.toString(), modifier)
-                StatCard("总字数", getTotalWords(), modifier)
-                StatCard("总时间", "2年", modifier)
+                StatCard("总文章", journalInfo.total.toString(), modifier)
+                StatCard("总字数", getTotalWords(journalInfo), modifier)
+                StatCard("总时间", TimeUtils.calculateTimeDifference(SystemConfig.start_time), modifier)
             }
         }
     }
 }
 
-private fun getTotalWords(): String {
-    return when(val total = JournalService.info.totalWords) {
+private fun getTotalWords(journalInfo: JournalInfo): String {
+    return when(val total = journalInfo.totalWords) {
         in 0..999 -> "$total"
         else -> {"${total / 1000}K"}
     }

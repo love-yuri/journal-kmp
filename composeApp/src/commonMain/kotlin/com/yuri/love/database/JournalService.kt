@@ -29,15 +29,15 @@ object JournalService {
     private val _currentPage = MutableStateFlow(0L) // 使用 StateFlow 管理页码
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val _journals = MutableStateFlow<List<Journal>>(emptyList())
-    val journals: StateFlow<List<Journal>> = _journals.asStateFlow()
+
     private val factory by lazy { DriverFactory.create() }
-    val filePath get() = factory.path(JournalDatabaseName)
-    private val log = logger {}
-    var info: JournalInfo = JournalInfo(
-        total = 0,
-        totalWords = 0
-    )
-        private set
+    private val _journalInfo = MutableStateFlow(JournalInfo(0, 0))
+    val journals: StateFlow<List<Journal>> = _journals.asStateFlow()
+
+    /**
+     * 日记信息
+     */
+    val JournalInfo: StateFlow<JournalInfo> = _journalInfo.asStateFlow()
 
     val query: JournalQueries by lazy {
         val driver = factory.createDriver(JournalDatabaseName)
@@ -57,7 +57,7 @@ object JournalService {
                 .asFlow()
                 .mapToOne(Dispatchers.IO)
                 .collect {
-                    info = it
+                    _journalInfo.value = it
                     if (it.total != 0L) {
                         refresh()
                     }
@@ -113,8 +113,22 @@ object JournalService {
      * load next page
      */
     fun nextPage() {
-        if (info.total > _journals.value.size) {
+        if (_journalInfo.value.total > _journals.value.size) {
             _currentPage.update { it + 1 }
         }
+    }
+
+    /**
+     * 本地备份
+     */
+    fun localBackup() {
+
+    }
+
+    /**
+     * webdav备份
+     */
+    fun webdavBackup() {
+        TODO("Not yet implemented")
     }
 }
