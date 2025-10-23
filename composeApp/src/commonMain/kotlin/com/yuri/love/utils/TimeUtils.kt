@@ -39,6 +39,16 @@ object TimeUtils {
     }
 
     @OptIn(ExperimentalTime::class)
+    fun formatTimestamp(timestampMillis: Long): String {
+        val instant = Instant.fromEpochMilliseconds(timestampMillis)
+        val localTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+        val localDate = localTime.date
+        val time = localTime.time
+
+        return "${localDate.year}年${localDate.month.number}月${localDate.day}日 ${time.hour}时${time.minute}分"
+    }
+
+    @OptIn(ExperimentalTime::class)
     fun calculateTimeDifference(targetTime: String): String {
         val zone = TimeZone.currentSystemDefault()
 

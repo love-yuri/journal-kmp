@@ -108,10 +108,10 @@ object WebDavService {
     /**
      * 创建目录
      */
-    suspend fun mkdir(account: String, password: String): Boolean {
+    suspend fun mkdir(path: String = DB_FOLDER): Boolean {
         try {
             service.mkdir(
-                "dav/$DB_FOLDER",
+                "dav/$path",
                 "Basic ${Base64.encode("$account:$password".toByteArray())}",
                 "text/xml"
             )
