@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.yuri.love.Journal
+import com.yuri.love.components.DeleteConfirmDialog
 import com.yuri.love.share.GlobalFonts
 import com.yuri.love.utils.TimeUtils.formatTimestampDay
 import com.yuri.love.utils.TimeUtils.formatTimestampTime
@@ -35,19 +36,22 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
- * 优化版日记卡片 - 现代化设计
+ * 优化版日记卡片 - 现代化设计 + 长按删除
  */
 @Composable
 @Preview
-fun JournalCardComposable(journal: Journal = Journal(
-    id = 1,
-    title = "今天是美好的一天，阳光明媚",
-    content = "22",
-    createdAt = 1757673445059,
-    updatedAt = 1757673445059,
-    mood = "开心",
-    weather = "晴天"
-)) {
+fun JournalCardComposable(
+    journal: Journal = Journal(
+        id = 1,
+        title = "今天是美好的一天，阳光明媚",
+        content = "22",
+        createdAt = 1757673445059,
+        updatedAt = 1757673445059,
+        mood = "开心",
+        weather = "晴天"
+    ),
+    onDelete: ((Journal) -> Unit)? = null
+) {
     val navigator = LocalNavigator.current
 
     // 动画状态
@@ -69,6 +73,8 @@ fun JournalCardComposable(journal: Journal = Journal(
         animationSpec = tween(durationMillis = 150),
         label = "shadow"
     )
+
+
 
     Card(
         modifier = Modifier
@@ -101,6 +107,9 @@ fun JournalCardComposable(journal: Journal = Journal(
                         },
                         onTap = {
                             navigator?.push(CreateScreen(journal))
+                        },
+                        onLongPress = {
+                            onDelete?.invoke(journal)
                         }
                     )
                 }
@@ -168,21 +177,6 @@ fun JournalCardComposable(journal: Journal = Journal(
                         isActive = isPressed
                     )
                 }
-
-
-                // 内容预览
-//                if (!journal.content.isNullOrBlank()) {
-//                    Text(
-//                        text = journal.content,
-//                        fontSize = 14.sp,
-//                        lineHeight = 20.sp,
-//                        color = Color(0xFF6B7280),
-//                        fontFamily = GlobalFonts.MapleMonoFont,
-//                        maxLines = 2,
-//                        overflow = TextOverflow.Ellipsis,
-//                        modifier = Modifier.padding(bottom = 12.dp)
-//                    )
-//                }
 
                 // 分割线
                 HorizontalDivider(

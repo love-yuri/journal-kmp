@@ -12,6 +12,7 @@ CREATE TABLE Journal (
 all: SELECT * FROM Journal;
 getById: SELECT * FROM Journal WHERE id = ?;
 insert: INSERT INTO Journal VALUES ?;
+deleteById: DELETE FROM Journal WHERE id = ?;
 page: SELECT * FROM Journal ORDER BY updatedAt DESC LIMIT ? OFFSET ? ;
 size: SELECT COUNT(*) FROM Journal;
 journalInfo: SELECT COUNT(*) AS total, COALESCE(SUM(LENGTH(content)), 0) AS totalWords FROM Journal;

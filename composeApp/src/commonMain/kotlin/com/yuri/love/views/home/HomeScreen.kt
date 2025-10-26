@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import com.yuri.love.Journal
+import com.yuri.love.components.DeleteConfirmDialog
 import com.yuri.love.database.JournalService
 import com.yuri.love.share.GlobalColors
 import com.yuri.love.utils.platformSafeTopPadding
@@ -79,6 +80,8 @@ fun JournalListScreen(journals: List<Journal>) {
     val listState = rememberLazyListState()
     var isLoadingMore by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
+    var selectedJournal by remember { mutableStateOf<Journal?>(null) }
+
     var y by remember { mutableFloatStateOf(0f) }
     val scope = rememberCoroutineScope()
 
@@ -159,13 +162,31 @@ fun JournalListScreen(journals: List<Journal>) {
         }
 
         items(journals) { journal ->
-            AnimatedJournalItem(journal)
+            AnimatedJournalItem(journal) {
+                selectedJournal = journal
+            }
         }
     }
+
+    // 删除确认对话框
+    DeleteConfirmDialog(
+        visible = selectedJournal != null,
+        title = "确认删除",
+        message = "确定要删除《${selectedJournal?.title?.takeIf { it.isNotEmpty() } ?: "这篇日记"}》吗？\n此操作无法撤销。",
+        onConfirm = {
+            JournalService.delete(selectedJournal!!)
+        },
+        onDismiss = {
+            selectedJournal = null
+        }
+    )
 }
 
 @Composable
-fun AnimatedJournalItem(journal: Journal) {
+fun AnimatedJournalItem(
+    journal: Journal,
+    onDelete: ((Journal) -> Unit)? = null
+) {
     var hasAppeared by remember { mutableStateOf(false) }
 
     val offsetY by animateDpAsState(
@@ -193,7 +214,7 @@ fun AnimatedJournalItem(journal: Journal) {
             .offset(y = offsetY)
             .alpha(alpha)
     ) {
-        JournalCardComposable(journal)
+        JournalCardComposable(journal, onDelete)
     }
 }
 
