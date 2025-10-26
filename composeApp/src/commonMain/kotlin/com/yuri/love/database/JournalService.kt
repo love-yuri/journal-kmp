@@ -160,6 +160,10 @@ object JournalService {
         return query.insert(journal).value > 0
     }
 
+    fun delete(journal: Journal): Boolean {
+        return query.deleteById(journal.id).value > 0
+    }
+
     /**
      * load next page
      */
