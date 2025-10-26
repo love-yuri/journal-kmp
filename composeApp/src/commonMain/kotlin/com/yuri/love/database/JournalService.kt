@@ -13,6 +13,7 @@ import com.yuri.love.JournalInfo
 import com.yuri.love.JournalQueries
 import com.yuri.love.database.JournalService.JournalBackupType.*
 import com.yuri.love.retrofit.WebDavService
+import com.yuri.love.share.DatabaseSuffix
 import com.yuri.love.share.JournalDatabaseName
 import com.yuri.love.share.TempRestoreFilePrefix
 import com.yuri.love.share.TempRestoreFileSuffix
@@ -259,8 +260,9 @@ object JournalService {
     private fun restoreFromWebdav(info: JournalBackupInfo) {
         scope.launch {
             try {
+                val fileName = "${info.name}.$DatabaseSuffix"
                 val file = WebDavService.dir()
-                    .firstOrNull { it.fileName.startsWith(info.name) }
+                    .firstOrNull { it.fileName == fileName }
                     ?: throw Exception("webdav备份文件不存在!!")
 
                 val tempFile = File.createTempFile(TempRestoreFilePrefix, TempRestoreFileSuffix)
@@ -291,6 +293,28 @@ object JournalService {
         } catch (e: Exception) {
             log.error { "恢复失败!! ${e.message}" }
             Notification.notificationState?.error("恢复失败!! ${e.message}")
+        }
+    }
+
+    /**
+     * 删除备份信息
+     */
+    fun deleteBackup(info: JournalBackupInfo) {
+        try {
+            if (info.type == Local) {
+                val file = File(factory.path(info.name))
+                if (!file.exists()) {
+                    throw Exception("${info.name} 文件不存在")
+                }
+                file.delete()
+            }
+            val list = SystemConfig.journal_backups.toMutableList()
+            list.remove(info)
+            SystemConfig.journal_backups = list
+            Notification.notificationState?.success("${info.name} 删除成功!!")
+        } catch (ex: Exception) {
+            log.info { "删除备份失败: ${info.name} msg: ${ex.message}" }
+            Notification.notificationState?.error("${info.name} 删除失败: ${ex.message}")
         }
     }
 }

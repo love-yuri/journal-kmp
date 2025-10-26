@@ -2,19 +2,17 @@ package com.yuri.love.views.backup
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import com.yuri.love.components.DeleteConfirmDialog
 import com.yuri.love.components.SimpleTopBar
 import com.yuri.love.database.JournalService
 import com.yuri.love.database.SystemConfig
@@ -42,7 +41,6 @@ private object ThemeConfig {
     val TextPrimary = Color(0xFF4A4A4A)
     val TextSecondary = Color(0xFF9E9E9E)
     val BorderLight = Color(0xFFFCE4EC)
-    val Success = Color(0xFF49DCC0)
     val Warning = Color(0xFFFFB74D)
     val Gradient1 = listOf(Color(0xFFFFE5EE), Color(0xFFFFF0F5))
     val Gradient2 = listOf(Color(0xFFFFB3C6), Color(0xFFFFC9DE))
@@ -67,11 +65,18 @@ class BackupScreen : Screen {
             Column(modifier = Modifier.fillMaxSize()) {
                 SimpleTopBar()
 
-                BackupScreenContent(
+                BackupScreenContent (
                     onBackupClick = { showBackupDialog = true },
                     onRestoreClick = { showRestoreDialog = true },
                     isLoading = isLoading,
-                    backupHistories = backupHistories
+                    backupHistories = backupHistories,
+                    onDelete = {
+                        val list = backupHistories.toMutableList()
+                        it.forEach { k ->
+                            list.remove(k)
+                        }
+                        backupHistories = list
+                    }
                 )
             }
         }
@@ -142,8 +147,10 @@ fun BackupScreenContent(
     onBackupClick: () -> Unit,
     onRestoreClick: () -> Unit,
     isLoading: Boolean,
-    backupHistories: List<JournalService.JournalBackupInfo>
+    backupHistories: List<JournalService.JournalBackupInfo>,
+    onDelete: (List<JournalService.JournalBackupInfo>) -> Unit
 ) {
+    var selectedDeleteItem by remember { mutableStateOf<List<JournalService.JournalBackupInfo>>(listOf()) }
     val isWebdavLoggedIn = SystemConfig.isLoggedIn
     val infiniteTransition = rememberInfiniteTransition(label = "loading")
     val progress by infiniteTransition.animateFloat(
@@ -292,6 +299,11 @@ fun BackupScreenContent(
                 color = ThemeConfig.TextPrimary,
                 letterSpacing = (-0.3).sp
             )
+
+            DeleteIcon {
+                selectedDeleteItem = backupHistories
+            }
+
             Text(
                 text = "${backupHistories.size} 条",
                 fontSize = 13.sp,
@@ -332,13 +344,36 @@ fun BackupScreenContent(
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
             ) {
+                val message = when(selectedDeleteItem.size) {
+                    0 -> "无效操作!"
+                    1 -> "确定要删除 ${selectedDeleteItem.first().title}: ${selectedDeleteItem.first().name} 吗？"
+                    else -> "确定要删除 ${selectedDeleteItem.size} 项吗？"
+                }
+                DeleteConfirmDialog(
+                    visible = selectedDeleteItem.isNotEmpty(),
+                    title = "确认删除",
+                    message = message,
+                    onConfirm = {
+                        selectedDeleteItem.forEach { backup ->
+                            JournalService.deleteBackup(backup)
+                        }
+                        onDelete(selectedDeleteItem)
+                        selectedDeleteItem = listOf()
+                    },
+                    onDismiss = {
+                        selectedDeleteItem = listOf()
+                    }
+                )
+
                 backupHistories.forEach { backup ->
                     Spacer(modifier = Modifier.height(6.dp))
                     BackupHistoryItem(
                         icon = backup.icon,
                         title = backup.title,
                         date = TimeUtils.formatTimestamp(backup.date)
-                    )
+                    ) {
+                        selectedDeleteItem = listOf(backup)
+                    }
                 }
             }
         }
@@ -349,7 +384,8 @@ fun BackupScreenContent(
 fun BackupHistoryItem(
     icon: ImageVector,
     title: String,
-    date: String
+    date: String,
+    onDelete: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -403,21 +439,36 @@ fun BackupHistoryItem(
                     )
                 }
             }
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(ThemeConfig.Success.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = null,
-                    tint = ThemeConfig.Success,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
+
+            DeleteIcon(onDelete)
         }
+    }
+
+}
+
+/**
+ * 删除图标组件
+ * @param onClick 点击删除图标时的回调函数
+ */
+@Composable
+private fun DeleteIcon(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(ThemeConfig.Background)
+            .border(1.dp, ThemeConfig.Secondary, RoundedCornerShape(8.dp))
+            .clickable(
+                onClick = onClick,
+                indication = ripple(),
+                interactionSource = remember { MutableInteractionSource() }
+            ).padding(4.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Delete,
+            contentDescription = null,
+            tint = ThemeConfig.Primary,
+            modifier = Modifier.size(25.dp)
+        )
     }
 }
 
