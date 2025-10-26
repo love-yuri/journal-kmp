@@ -52,8 +52,8 @@ fun DeleteConfirmDialog(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .clip(RoundedCornerShape(20.dp))
+                        .padding(horizontal = 32.dp)
+                        .clip(RoundedCornerShape(24.dp))
                         .background(Color.White)
                 ) {
                     Column(
@@ -115,6 +115,9 @@ fun DeleteConfirmDialog(
                                 shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.outlinedButtonColors(
                                     contentColor = Color(0xFF666666)
+                                ),
+                                border = ButtonDefaults.outlinedButtonBorder(true).copy(
+                                    width = 1.5.dp
                                 )
                             ) {
                                 Text(
