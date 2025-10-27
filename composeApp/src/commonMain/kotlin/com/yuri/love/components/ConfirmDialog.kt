@@ -24,6 +24,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
+/**
+ * 删除确认框
+ */
 @Composable
 fun DeleteConfirmDialog(
     visible: Boolean,
@@ -31,6 +34,32 @@ fun DeleteConfirmDialog(
     message: String = "此操作无法撤销，确定要删除吗？",
     confirmText: String = "删除",
     cancelText: String = "取消",
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    ConfirmDialog(
+        visible = visible,
+        title = title,
+        message = message,
+        confirmText = confirmText,
+        cancelText = cancelText,
+        confirmColor = Color(0xFFD32F2F),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss
+    )
+}
+
+/**
+ * 再次确认对话框
+ */
+@Composable
+fun ConfirmDialog(
+    visible: Boolean,
+    title: String,
+    message: String,
+    confirmText: String = "确认",
+    cancelText: String = "取消",
+    confirmColor: Color,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -138,7 +167,7 @@ fun DeleteConfirmDialog(
                                     .height(48.dp),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFD32F2F),
+                                    containerColor = confirmColor,
                                     contentColor = Color.White
                                 )
                             ) {
