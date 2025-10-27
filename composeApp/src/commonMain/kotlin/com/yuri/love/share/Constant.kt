@@ -26,6 +26,11 @@ const val WeatherApiKey: String = "S4gOH8lQuBXpjpLGv"
 const val WeatherApiUrl: String = "https://api.seniverse.com/v3/"
 
 /**
+ * 备份数据库中缀
+ */
+const val DatabaseBackupSuffix : String = "_backup_"
+
+/**
  * 网络恢复时临时文件前缀
  */
 const val TempRestoreFilePrefix = "temp_restore"

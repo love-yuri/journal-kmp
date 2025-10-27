@@ -13,6 +13,7 @@ import com.yuri.love.JournalInfo
 import com.yuri.love.JournalQueries
 import com.yuri.love.database.JournalService.JournalBackupType.*
 import com.yuri.love.retrofit.WebDavService
+import com.yuri.love.share.DatabaseBackupSuffix
 import com.yuri.love.share.DatabaseSuffix
 import com.yuri.love.share.JournalDatabaseName
 import com.yuri.love.share.TempRestoreFilePrefix
@@ -184,7 +185,7 @@ object JournalService {
 
         val now = TimeUtils.now
         val backupInfo = JournalBackupInfo (
-            "${JournalDatabaseName}_backup_${now}",
+            "${JournalDatabaseName}${DatabaseBackupSuffix}${now}",
             now,
             type
         )
@@ -248,7 +249,14 @@ object JournalService {
         if (!file.exists()) {
            throw Exception("本地备份文件不存在!! ${file.path}")
         }
+        restoreFromFile(file)
+    }
 
+    /**
+     * 从文件恢复
+     * @param file 备份信息
+     */
+    fun restoreFromFile(file: File) {
         file.copyTo(File(factory.path(JournalDatabaseName)), overwrite = true)
 
         scope.launch {
@@ -273,9 +281,7 @@ object JournalService {
                 if (!WebDavService.download(file.fileName, tempFile)) {
                     throw Exception("下载失败!!")
                 }
-                tempFile.copyTo(File(factory.path(JournalDatabaseName)), overwrite = true)
-                _journalInfo.value = query.journalInfo().executeAsOne()
-                refresh()
+                restoreFromFile(tempFile)
             } catch (e: Exception) {
                 log.error { "恢复失败: ${e.message}" }
                 Notification.notificationState?.error("恢复失败: ${e.message}")
