@@ -28,13 +28,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
+import com.yuri.love.components.ConfirmDialog
 import com.yuri.love.components.ModernIconButton
+import com.yuri.love.database.JournalService
 import com.yuri.love.database.SystemConfig
 import com.yuri.love.retrofit.WebDavService
 import com.yuri.love.retrofit.WebDavService.WebdavFile
+import com.yuri.love.share.DatabaseBackupSuffix
 import com.yuri.love.share.GlobalValue
+import com.yuri.love.share.JournalDatabaseName
+import com.yuri.love.share.TempRestoreFilePrefix
+import com.yuri.love.share.TempRestoreFileSuffix
+import com.yuri.love.utils.notification.Notification
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 import java.net.URLDecoder
 
 data class WebdavConfig(
@@ -137,6 +145,28 @@ private fun WebdavScreenContent() {
                     if (isLoading) {
                         LoadingView()
                     } else {
+                        var selectedBackupFile by remember { mutableStateOf<WebdavFile?>(null) }
+                        ConfirmDialog (
+                            visible = selectedBackupFile != null,
+                            title = "是否恢复备份",
+                            message = "将从: ${selectedBackupFile?.fileName} 恢复数据",
+                            onConfirm = {
+                                val fileName = selectedBackupFile!!.fileName
+                                scope.launch {
+                                    val tempFile = File.createTempFile(TempRestoreFilePrefix, TempRestoreFileSuffix)
+                                    if (!WebDavService.download(fileName, tempFile)) {
+                                        throw Exception("下载失败!!")
+                                    }
+                                    JournalService.restoreFromFile(tempFile)
+                                    Notification.notificationState?.success("恢复成功!!")
+                                }
+                            },
+                            cancelText = "取消",
+                            confirmColor = Color(0xFF388E3C),
+                            onDismiss = {
+                                selectedBackupFile = null
+                            }
+                        )
                         FileList(
                             files = currentFiles,
                             onFileClick = { file ->
@@ -147,15 +177,11 @@ private fun WebdavScreenContent() {
                                         currentFiles = WebDavService.dir(currentPath).drop(1)
                                         isLoading = false
                                     }
-                                } else {
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar("打开文件: ${file.fileName}")
-                                    }
                                 }
                             },
                             onFileDownload = { file ->
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("下载: ${file.fileName}")
+                                if (file.fileName.startsWith("${JournalDatabaseName}${DatabaseBackupSuffix}")) {
+                                    selectedBackupFile = file
                                 }
                             }
                         )
