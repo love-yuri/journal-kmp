@@ -32,9 +32,7 @@ import com.yuri.love.components.ModernIconButton
 import com.yuri.love.database.SystemConfig
 import com.yuri.love.retrofit.WebDavService
 import com.yuri.love.retrofit.WebDavService.WebdavFile
-import com.yuri.love.share.GlobalColors
 import com.yuri.love.share.GlobalValue
-import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
@@ -54,7 +52,7 @@ class WebdavScreen : Screen {
 }
 
 // 现代配色方案
-object ModernColors {
+private object ModernColors {
     val Primary = Color(0xFFFFB3C6)          // 柔和的粉色
     val Secondary = Color(0xFFFFC9DE)        // 淡粉色
     val Background = Color(0xFFFFFBFC)       // 极浅的粉白色
@@ -595,7 +593,7 @@ fun ModernFileItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
-                        text = if (file.isFolder) "文件夹" else formatFileSize(null),
+                        text = if (file.isFolder) "文件夹" else "文件",
                         fontSize = 13.sp,
                         color = ModernColors.TextSecondary
                     )
@@ -902,16 +900,6 @@ fun getFileIcon(fileName: String?): ImageVector {
         "zip", "rar", "7z" -> Icons.Outlined.FolderZip
         "txt", "md" -> Icons.Outlined.Description
         else -> Icons.AutoMirrored.Outlined.InsertDriveFile
-    }
-}
-
-fun formatFileSize(size: Long?): String {
-    if (size == null) return "未知大小"
-    return when {
-        size < 1024 -> "$size B"
-        size < 1024 * 1024 -> "${size / 1024} KB"
-        size < 1024 * 1024 * 1024 -> "${size / (1024 * 1024)} MB"
-        else -> "${size / (1024 * 1024 * 1024)} GB"
     }
 }
 
