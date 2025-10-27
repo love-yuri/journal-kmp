@@ -47,12 +47,12 @@ data class WebdavConfig(
 class WebdavScreen : Screen {
     @Composable
     override fun Content() {
-        ModernWebdavScreen()
+        WebdavScreenContent()
     }
 }
 
 // 现代配色方案
-private object ModernColors {
+private object ThemeColors {
     val Primary = Color(0xFFFFB3C6)          // 柔和的粉色
     val Secondary = Color(0xFFFFC9DE)        // 淡粉色
     val Background = Color(0xFFFFFBFC)       // 极浅的粉白色
@@ -69,7 +69,7 @@ private object ModernColors {
 
 @OptIn(ExperimentalMaterial3Api::class, InternalVoyagerApi::class)
 @Composable
-fun ModernWebdavScreen() {
+private fun WebdavScreenContent() {
     var webdavConfig by remember {
         mutableStateOf(WebdavConfig (
             serverUrl = WebDavService.HOST,
@@ -95,7 +95,7 @@ fun ModernWebdavScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ModernColors.Background)
+            .background(ThemeColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             ModernTopBar(
@@ -115,14 +115,14 @@ fun ModernWebdavScreen() {
 
             if (!webdavConfig.isLoggedIn) {
                 // 现代化空状态
-                ModernEmptyState {
+                EmptyState {
                     showLoginDialog = true
                 }
             } else {
                 // 文件内容区域
                 Column(modifier = Modifier.fillMaxSize()) {
                     // 路径导航
-                    ModernPathBar(
+                    PathBar(
                         currentPath = currentPath,
                         onPathClick = { path ->
                             currentPath = path
@@ -135,9 +135,9 @@ fun ModernWebdavScreen() {
                     )
 
                     if (isLoading) {
-                        ModernLoadingView()
+                        LoadingView()
                     } else {
-                        ModernFileList(
+                        FileList(
                             files = currentFiles,
                             onFileClick = { file ->
                                 if (file.isFolder) {
@@ -165,7 +165,7 @@ fun ModernWebdavScreen() {
         }
 
         if (showLoginDialog) {
-            ModernLoginDialog(
+            LoginDialog(
                 config = webdavConfig,
                 onDismiss = { showLoginDialog = false },
                 onLogin = { url, username, password ->
@@ -229,7 +229,7 @@ fun ModernTopBar(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                Brush.horizontalGradient(ModernColors.Gradient1)
+                Brush.horizontalGradient(ThemeColors.Gradient1)
             )
             .statusBarsPadding()
     ) {
@@ -307,7 +307,7 @@ fun ModernTopBar(
 }
 
 @Composable
-fun ModernEmptyState(onLoginClick: () -> Unit) {
+private fun EmptyState(onLoginClick: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -322,7 +322,7 @@ fun ModernEmptyState(onLoginClick: () -> Unit) {
                     .size(120.dp)
                     .clip(CircleShape)
                     .background(
-                        Brush.linearGradient(ModernColors.Gradient1)
+                        Brush.linearGradient(ThemeColors.Gradient1)
                     ),
                 contentAlignment = Alignment.Center
             ) {
@@ -340,7 +340,7 @@ fun ModernEmptyState(onLoginClick: () -> Unit) {
                 text = "还未连接到服务器",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = ModernColors.TextPrimary
+                color = ThemeColors.TextPrimary
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -348,7 +348,7 @@ fun ModernEmptyState(onLoginClick: () -> Unit) {
             Text(
                 text = "配置 WebDAV 服务器开始使用",
                 fontSize = 15.sp,
-                color = ModernColors.TextSecondary
+                color = ThemeColors.TextSecondary
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -369,7 +369,7 @@ fun ModernEmptyState(onLoginClick: () -> Unit) {
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            Brush.horizontalGradient(ModernColors.Gradient1)
+                            Brush.horizontalGradient(ThemeColors.Gradient1)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
@@ -396,7 +396,7 @@ fun ModernEmptyState(onLoginClick: () -> Unit) {
 }
 
 @Composable
-fun ModernPathBar(
+private fun PathBar(
     currentPath: String,
     onPathClick: (String) -> Unit
 ) {
@@ -409,7 +409,7 @@ fun ModernPathBar(
         Icon(
             imageVector = Icons.Outlined.Folder,
             contentDescription = null,
-            tint = ModernColors.Primary,
+            tint = ThemeColors.Primary,
             modifier = Modifier.size(20.dp)
         )
 
@@ -423,7 +423,7 @@ fun ModernPathBar(
                 .clip(RoundedCornerShape(8.dp))
                 .clickable { onPathClick("/") }
                 .padding(horizontal = 8.dp, vertical = 4.dp),
-            color = ModernColors.Primary,
+            color = ThemeColors.Primary,
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp
         )
@@ -433,7 +433,7 @@ fun ModernPathBar(
                 Icons.Outlined.ChevronRight,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
-                tint = ModernColors.TextSecondary
+                tint = ThemeColors.TextSecondary
             )
             Text(
                 text = decodePathComponents(part),
@@ -445,9 +445,9 @@ fun ModernPathBar(
                     }
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 color = if (index == pathParts.lastIndex)
-                    ModernColors.TextPrimary
+                    ThemeColors.TextPrimary
                 else
-                    ModernColors.Primary,
+                    ThemeColors.Primary,
                 fontWeight = if (index == pathParts.lastIndex) FontWeight.SemiBold else FontWeight.Medium,
                 fontSize = 14.sp
             )
@@ -465,7 +465,7 @@ private fun decodePathComponents(path: String): String {
 }
 
 @Composable
-fun ModernLoadingView() {
+private fun LoadingView() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -476,12 +476,12 @@ fun ModernLoadingView() {
         ) {
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp),
-                color = ModernColors.Primary,
+                color = ThemeColors.Primary,
                 strokeWidth = 4.dp
             )
             Text(
                 text = "加载中...",
-                color = ModernColors.TextSecondary,
+                color = ThemeColors.TextSecondary,
                 fontSize = 14.sp
             )
         }
@@ -489,7 +489,7 @@ fun ModernLoadingView() {
 }
 
 @Composable
-fun ModernFileList(
+private fun FileList(
     files: List<WebdavFile>,
     onFileClick: (WebdavFile) -> Unit,
     onFileDownload: (WebdavFile) -> Unit
@@ -504,12 +504,12 @@ fun ModernFileList(
                     imageVector = Icons.Outlined.FolderOpen,
                     contentDescription = null,
                     modifier = Modifier.size(80.dp),
-                    tint = ModernColors.TextSecondary.copy(alpha = 0.3f)
+                    tint = ThemeColors.TextSecondary.copy(alpha = 0.3f)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "此文件夹为空",
-                    color = ModernColors.TextSecondary,
+                    color = ThemeColors.TextSecondary,
                     fontSize = 15.sp
                 )
             }
@@ -521,7 +521,7 @@ fun ModernFileList(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(files) { file ->
-                ModernFileItem(
+                FileItem(
                     file = file,
                     onClick = { onFileClick(file) },
                     onDownload = { onFileDownload(file) }
@@ -532,7 +532,7 @@ fun ModernFileList(
 }
 
 @Composable
-fun ModernFileItem(
+private fun FileItem(
     file: WebdavFile,
     onClick: () -> Unit,
     onDownload: () -> Unit
@@ -545,10 +545,10 @@ fun ModernFileItem(
             .shadow(
                 elevation = if (isPressed) 8.dp else 2.dp,
                 shape = RoundedCornerShape(16.dp),
-                ambientColor = ModernColors.Primary.copy(alpha = 0.1f)
+                ambientColor = ThemeColors.Primary.copy(alpha = 0.1f)
             )
             .clip(RoundedCornerShape(16.dp))
-            .background(ModernColors.Surface)
+            .background(ThemeColors.Surface)
             .clickable {
                 isPressed = true
                 onClick()
@@ -566,16 +566,16 @@ fun ModernFileItem(
                     .clip(RoundedCornerShape(12.dp))
                     .background(
                         if (file.isFolder)
-                            ModernColors.Primary.copy(alpha = 0.1f)
+                            ThemeColors.Primary.copy(alpha = 0.1f)
                         else
-                            ModernColors.Secondary.copy(alpha = 0.1f)
+                            ThemeColors.Secondary.copy(alpha = 0.1f)
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (file.isFolder) Icons.Outlined.Folder else getFileIcon(file.fileName),
                     contentDescription = null,
-                    tint = if (file.isFolder) ModernColors.Primary else ModernColors.Secondary,
+                    tint = if (file.isFolder) ThemeColors.Primary else ThemeColors.Secondary,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -588,14 +588,14 @@ fun ModernFileItem(
                     text = file.fileName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = ModernColors.TextPrimary
+                    color = ThemeColors.TextPrimary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
                         text = if (file.isFolder) "文件夹" else "文件",
                         fontSize = 13.sp,
-                        color = ModernColors.TextSecondary
+                        color = ThemeColors.TextSecondary
                     )
                 }
             }
@@ -610,13 +610,13 @@ fun ModernFileItem(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(ModernColors.Primary.copy(alpha = 0.1f)),
+                            .background(ThemeColors.Primary.copy(alpha = 0.1f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Outlined.Download,
                             contentDescription = "下载",
-                            tint = ModernColors.Primary,
+                            tint = ThemeColors.Primary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -625,7 +625,7 @@ fun ModernFileItem(
                 Icon(
                     Icons.Outlined.ChevronRight,
                     contentDescription = null,
-                    tint = ModernColors.TextSecondary,
+                    tint = ThemeColors.TextSecondary,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -642,7 +642,7 @@ fun ModernFileItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ModernLoginDialog(
+private fun LoginDialog(
     config: WebdavConfig,
     onDismiss: () -> Unit,
     onLogin: (String, String, String) -> Unit,
@@ -665,7 +665,7 @@ fun ModernLoginDialog(
                 .fillMaxWidth(0.9f)
                 .wrapContentHeight()
                 .clip(RoundedCornerShape(24.dp))
-                .background(ModernColors.Surface)
+                .background(ThemeColors.Surface)
                 .clickable(enabled = false) { }
                 .padding(24.dp)
         ) {
@@ -675,7 +675,7 @@ fun ModernLoginDialog(
                     text = if (config.isLoggedIn) "服务器设置" else "连接到 WebDAV",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = ModernColors.TextPrimary
+                    color = ThemeColors.TextPrimary
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -689,8 +689,8 @@ fun ModernLoginDialog(
                             .background(
                                 Brush.horizontalGradient(
                                     listOf(
-                                        ModernColors.Success.copy(alpha = 0.1f),
-                                        ModernColors.Success.copy(alpha = 0.05f)
+                                        ThemeColors.Success.copy(alpha = 0.1f),
+                                        ThemeColors.Success.copy(alpha = 0.05f)
                                     )
                                 )
                             )
@@ -701,13 +701,13 @@ fun ModernLoginDialog(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(CircleShape)
-                                    .background(ModernColors.Success.copy(alpha = 0.2f)),
+                                    .background(ThemeColors.Success.copy(alpha = 0.2f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     Icons.Outlined.CheckCircle,
                                     contentDescription = null,
-                                    tint = ModernColors.Success,
+                                    tint = ThemeColors.Success,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -716,13 +716,13 @@ fun ModernLoginDialog(
                                 Text(
                                     "已连接",
                                     fontWeight = FontWeight.Bold,
-                                    color = ModernColors.Success,
+                                    color = ThemeColors.Success,
                                     fontSize = 16.sp
                                 )
                                 Text(
                                     config.username,
                                     fontSize = 13.sp,
-                                    color = ModernColors.TextSecondary
+                                    color = ThemeColors.TextSecondary
                                 )
                             }
                         }
@@ -747,7 +747,7 @@ fun ModernLoginDialog(
                     }
                 } else {
                     // 登录表单
-                    ModernTextField(
+                    TextField(
                         value = serverUrl,
                         onValueChange = { serverUrl = it },
                         label = "服务器地址",
@@ -757,7 +757,7 @@ fun ModernLoginDialog(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    ModernTextField(
+                    TextField(
                         value = username,
                         onValueChange = { username = it },
                         label = "用户名",
@@ -767,7 +767,7 @@ fun ModernLoginDialog(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    ModernTextField(
+                    TextField(
                         value = password,
                         onValueChange = { password = it },
                         label = "密码",
@@ -789,7 +789,7 @@ fun ModernLoginDialog(
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
-                            disabledContainerColor = ModernColors.BorderLight
+                            disabledContainerColor = ThemeColors.BorderLight
                         ),
                         contentPadding = PaddingValues(0.dp),
                         shape = RoundedCornerShape(14.dp)
@@ -799,9 +799,9 @@ fun ModernLoginDialog(
                                 .fillMaxSize()
                                 .background(
                                     if (serverUrl.isNotEmpty() && username.isNotEmpty() && password.isNotEmpty())
-                                        Brush.horizontalGradient(ModernColors.Gradient1)
+                                        Brush.horizontalGradient(ThemeColors.Gradient1)
                                     else
-                                        Brush.horizontalGradient(listOf(ModernColors.BorderLight, ModernColors.BorderLight))
+                                        Brush.horizontalGradient(listOf(ThemeColors.BorderLight, ThemeColors.BorderLight))
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
@@ -822,7 +822,7 @@ fun ModernLoginDialog(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("取消", color = ModernColors.TextSecondary)
+                    Text("取消", color = ThemeColors.TextSecondary)
                 }
             }
         }
@@ -830,7 +830,7 @@ fun ModernLoginDialog(
 }
 
 @Composable
-fun ModernTextField(
+private fun TextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -845,19 +845,19 @@ fun ModernTextField(
             text = label,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
-            color = ModernColors.TextSecondary,
+            color = ThemeColors.TextSecondary,
             modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
         )
 
         OutlinedTextField (
             value = value,
             onValueChange = onValueChange,
-            placeholder = { Text(placeholder, color = ModernColors.TextSecondary.copy(alpha = 0.5f)) },
+            placeholder = { Text(placeholder, color = ThemeColors.TextSecondary.copy(alpha = 0.5f)) },
             leadingIcon = {
                 Icon(
                     leadingIcon,
                     contentDescription = null,
-                    tint = ModernColors.Primary,
+                    tint = ThemeColors.Primary,
                     modifier = Modifier.size(20.dp)
                 )
             },
@@ -867,7 +867,7 @@ fun ModernTextField(
                         Icon(
                             if (passwordVisible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
                             contentDescription = null,
-                            tint = ModernColors.TextSecondary,
+                            tint = ThemeColors.TextSecondary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -880,10 +880,10 @@ fun ModernTextField(
             modifier = Modifier.fillMaxWidth().height(60.dp),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = ModernColors.Primary,
-                unfocusedBorderColor = ModernColors.BorderLight,
-                focusedTextColor = ModernColors.TextPrimary,
-                unfocusedTextColor = ModernColors.TextPrimary
+                focusedBorderColor = ThemeColors.Primary,
+                unfocusedBorderColor = ThemeColors.BorderLight,
+                focusedTextColor = ThemeColors.TextPrimary,
+                unfocusedTextColor = ThemeColors.TextPrimary
             ),
             singleLine = true
         )
