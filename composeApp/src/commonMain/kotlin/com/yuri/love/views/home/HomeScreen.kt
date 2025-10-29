@@ -26,11 +26,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.yuri.love.Journal
 import com.yuri.love.components.DeleteConfirmDialog
 import com.yuri.love.database.JournalService
-import com.yuri.love.share.GlobalColors
 import com.yuri.love.utils.platformSafeTopPadding
 import com.yuri.love.views.home.components.DiaryHeaderAdvanced
 import com.yuri.love.views.home.components.JournalCardComposable
 import com.yuri.love.components.TopBar
+import com.yuri.love.share.GlobalStyle
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -56,7 +56,7 @@ private fun CreateHome(journals: List<Journal>) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(GlobalColors.tapBarBackground)
+            .background(GlobalStyle.tapBarBackground)
             .platformSafeTopPadding()
     ) {
         // TapBar
@@ -65,7 +65,7 @@ private fun CreateHome(journals: List<Journal>) {
         // 主内容区域
         Column(
             modifier = Modifier
-                .background(GlobalColors.softPinkGradient)
+                .background(GlobalStyle.softPinkGradient)
                 .padding(start = 10.dp, end = 10.dp)
                 .weight(1f)
         ) {

@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yuri.love.share.GlobalFonts
+import com.yuri.love.share.GlobalStyle
 import kotlinx.coroutines.delay
 
 /**
@@ -61,7 +61,7 @@ fun DiaryHeaderAdvanced() {
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1F2937),
-                    fontFamily = GlobalFonts.MapleMonoFont
+                    fontFamily = GlobalStyle.MapleMonoFont
                 ),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -82,7 +82,7 @@ fun DiaryHeaderAdvanced() {
                     style = MaterialTheme.typography.bodyLarge.copy(
                         color = Color(0xFF4B5563)
                     ),
-                    fontFamily = GlobalFonts.MapleMonoFont
+                    fontFamily = GlobalStyle.MapleMonoFont
                 )
             }
         }

@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.yuri.love.Journal
 import com.yuri.love.components.DeleteConfirmDialog
-import com.yuri.love.share.GlobalFonts
+import com.yuri.love.share.GlobalStyle
 import com.yuri.love.utils.TimeUtils.formatTimestampDay
 import com.yuri.love.utils.TimeUtils.formatTimestampTime
 import com.yuri.love.views.create.CreateScreen
@@ -165,7 +165,7 @@ fun JournalCardComposable(
                         fontSize = 18.sp,
                         lineHeight = 22.sp,
                         color = Color(0xFF2D1B4E),
-                        fontFamily = GlobalFonts.MapleMonoFont,
+                        fontFamily = GlobalStyle.MapleMonoFont,
                         modifier = Modifier.weight(1f),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
@@ -215,7 +215,7 @@ fun JournalCardComposable(
                         fontSize = 12.sp,
                         color = Color(0xFF9CA3AF),
                         fontWeight = FontWeight.Medium,
-                        fontFamily = GlobalFonts.MapleMonoFont
+                        fontFamily = GlobalStyle.MapleMonoFont
                     )
                 }
 
@@ -327,7 +327,7 @@ fun MetaInfoItem(
             fontSize = 13.sp,
             color = Color(0xFF6B7280),
             fontWeight = FontWeight.Medium,
-            fontFamily = GlobalFonts.MapleMonoFont
+            fontFamily = GlobalStyle.MapleMonoFont
         )
     }
 }
