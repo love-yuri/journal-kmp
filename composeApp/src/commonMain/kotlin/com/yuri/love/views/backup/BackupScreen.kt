@@ -29,6 +29,7 @@ import com.yuri.love.components.DeleteConfirmDialog
 import com.yuri.love.components.SimpleTopBar
 import com.yuri.love.database.JournalService
 import com.yuri.love.database.SystemConfig
+import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.NavigatorManager
 import com.yuri.love.utils.TimeUtils
@@ -199,7 +200,7 @@ fun BackupScreenContent(
                         onClick = {
                             GlobalValue.navigatorManager.push(NavigatorManager.ScreenPageType.Webdav)
                         },
-                        indication = ripple(),
+                        indication = GlobalStyle.ripple,
                         interactionSource = remember { MutableInteractionSource() }
                     )
                     .padding(8.dp)
@@ -459,7 +460,7 @@ private fun DeleteIcon(onClick: () -> Unit) {
             .border(1.dp, ThemeConfig.Secondary, RoundedCornerShape(8.dp))
             .clickable(
                 onClick = onClick,
-                indication = ripple(),
+                indication = GlobalStyle.ripple,
                 interactionSource = remember { MutableInteractionSource() }
             ).padding(4.dp)
     ) {
@@ -486,7 +487,7 @@ private fun ActionBtn (
             .border(1.dp, ThemeConfig.Secondary, RoundedCornerShape(12.dp))
             .clickable(
                 onClick = onClick,
-                indication = ripple(),
+                indication = GlobalStyle.ripple,
                 interactionSource = remember { MutableInteractionSource() }
             )
             .padding(8.dp)
@@ -543,7 +544,7 @@ fun BackupDialog(
             .background(Color.Black.copy(alpha = 0.5f))
             .clickable(
                 onClick = onDismiss,
-                indication = null,
+                indication = GlobalStyle.ripple,
                 interactionSource = remember { MutableInteractionSource() }
             ),
         contentAlignment = Alignment.Center
@@ -556,7 +557,7 @@ fun BackupDialog(
                 .background(ThemeConfig.Surface)
                 .clickable(
                     enabled = false,
-                    indication = null,
+                    indication = GlobalStyle.ripple,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {}
                 .padding(26.dp)
@@ -670,7 +671,7 @@ private fun ClickableButton(
             .background(Brush.linearGradient(background))
             .clickable(
                 onClick = onClick,
-                indication = ripple(),
+                indication = GlobalStyle.ripple,
                 interactionSource = remember { MutableInteractionSource() }
             ),
         contentAlignment = Alignment.Center
@@ -695,7 +696,7 @@ private fun RestoreDialog(onDismiss: () -> Unit) {
             .background(Color.Black.copy(alpha = 0.5f))
             .clickable(
                 onClick = onDismiss,
-                indication = null,
+                indication = GlobalStyle.ripple,
                 interactionSource = remember { MutableInteractionSource() }
             ),
         contentAlignment = Alignment.Center
@@ -708,7 +709,7 @@ private fun RestoreDialog(onDismiss: () -> Unit) {
                 .background(ThemeConfig.Surface)
                 .clickable(
                     enabled = false,
-                    indication = null,
+                    indication = GlobalStyle.ripple,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {}
                 .padding(26.dp)
@@ -840,7 +841,7 @@ private fun WebdavDialog(
             .background(Color.Black.copy(alpha = 0.5f))
             .clickable(
                 onClick = onDismiss,
-                indication = null,
+                indication = GlobalStyle.ripple,
                 interactionSource = remember { MutableInteractionSource() }
             ),
         contentAlignment = Alignment.Center
@@ -853,7 +854,7 @@ private fun WebdavDialog(
                 .background(ThemeConfig.Surface)
                 .clickable(
                     enabled = false,
-                    indication = null,
+                    indication = GlobalStyle.ripple,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {}
                 .padding(26.dp)
@@ -909,7 +910,7 @@ private fun WebdavDialog(
                             .background(ThemeConfig.BorderLight)
                             .clickable(
                                 onClick = onDismiss,
-                                indication = null,
+                                indication = GlobalStyle.ripple,
                                 interactionSource = remember { MutableInteractionSource() }
                             ),
                         contentAlignment = Alignment.Center
@@ -933,7 +934,7 @@ private fun WebdavDialog(
                             )
                             .clickable(
                                 onClick = onNavigateToSettings,
-                                indication = null,
+                                indication = GlobalStyle.ripple,
                                 interactionSource = remember { MutableInteractionSource() }
                             ),
                         contentAlignment = Alignment.Center
@@ -978,7 +979,7 @@ fun BackupOption(
             )
             .clickable(
                 onClick = onClick,
-                indication = null,
+                indication = GlobalStyle.ripple,
                 interactionSource = remember { MutableInteractionSource() }
             )
             .padding(14.dp)

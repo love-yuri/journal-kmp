@@ -60,7 +60,7 @@ fun TopBar() {
                     .clip(CircleShape)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
-                        indication = LocalIndication.current,
+                        indication = GlobalStyle.ripple,
                         onClick = {
                             drawerController.open()
                         }
@@ -86,7 +86,7 @@ fun TopBar() {
                     .clip(CircleShape)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
-                        indication = LocalIndication.current,
+                        indication = GlobalStyle.ripple,
                         onClick = {
                             navigator.push(CreateScreen())
                         }

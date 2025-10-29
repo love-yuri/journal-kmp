@@ -22,7 +22,7 @@ fun ModernIconButton(
     IconButton(
         onClick = onClick,
         modifier = modifier.size(40.dp),
-        enabled = enabled
+        enabled = enabled,
     ) {
         Icon(
             imageVector = icon,

@@ -2,6 +2,7 @@ package com.yuri.love.views.webdav
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,6 +36,7 @@ import com.yuri.love.database.SystemConfig
 import com.yuri.love.retrofit.WebDavService
 import com.yuri.love.retrofit.WebDavService.WebdavFile
 import com.yuri.love.share.DatabaseBackupSuffix
+import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.JournalDatabaseName
 import com.yuri.love.share.TempRestoreFilePrefix
@@ -106,7 +108,7 @@ private fun WebdavScreenContent() {
             .background(ThemeColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            ModernTopBar(
+            TopBar(
                 isLoggedIn = webdavConfig.isLoggedIn,
                 onLoginClick = { showLoginDialog = true },
                 onRefreshClick = {
@@ -243,7 +245,7 @@ private fun WebdavScreenContent() {
 }
 
 @Composable
-fun ModernTopBar(
+fun TopBar(
     isLoggedIn: Boolean,
     onLoginClick: () -> Unit,
     onRefreshClick: () -> Unit,
@@ -575,7 +577,10 @@ private fun FileItem(
             )
             .clip(RoundedCornerShape(16.dp))
             .background(ThemeColors.Surface)
-            .clickable {
+            .clickable(
+                indication = GlobalStyle.ripple,
+                interactionSource = remember { MutableInteractionSource() },
+            ) {
                 isPressed = true
                 onClick()
             }
