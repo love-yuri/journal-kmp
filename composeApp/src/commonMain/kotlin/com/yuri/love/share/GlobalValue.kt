@@ -96,8 +96,12 @@ object NavigatorManager {
             return
         }
         navigator.pop()
-        pageStack.removeLast()
-        _currentPageType.update { pageStack.last() }
+        if (pageStack.isNotEmpty()) {
+            pageStack.removeLast()
+            if (pageStack.isNotEmpty()) {
+                _currentPageType.update { pageStack.last() }
+            }
+        }
     }
 
     /**
