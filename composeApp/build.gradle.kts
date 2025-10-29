@@ -53,6 +53,7 @@ kotlin {
             implementation(libs.android.driver)
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.biometric)
         }
         commonMain.dependencies {
             /* xml */
