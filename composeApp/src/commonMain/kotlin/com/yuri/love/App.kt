@@ -61,6 +61,10 @@ fun App() {
                     ) {
                         Navigator(
                             screen = GlobalValue.navigatorManager.defaultScreen,
+                            onBackPressed = {
+                                GlobalValue.navigatorManager.pop()
+                                false
+                            }
                         ) { navigator ->
                             GlobalValue.navigatorManager.init(navigator)
                             SlideTransition(navigator)
