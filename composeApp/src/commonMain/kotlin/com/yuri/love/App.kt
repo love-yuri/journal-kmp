@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.yuri.love.retrofit.initCurrentWeather
-import com.yuri.love.share.GlobalColors
+import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.NavigatorManager.ScreenPageType
 import com.yuri.love.utils.notification.NotificationContainer
@@ -57,7 +57,7 @@ fun App() {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(GlobalColors.softPinkGradient)
+                            .background(GlobalStyle.softPinkGradient)
                     ) {
                         Navigator(
                             screen = GlobalValue.navigatorManager.defaultScreen,

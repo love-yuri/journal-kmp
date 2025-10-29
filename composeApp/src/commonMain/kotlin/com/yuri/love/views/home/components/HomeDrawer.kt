@@ -27,7 +27,7 @@ import com.yuri.love.JournalInfo
 import com.yuri.love.database.JournalService
 import com.yuri.love.database.SystemConfig
 import com.yuri.love.database.SystemConfig.get
-import com.yuri.love.share.GlobalFonts
+import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.NavigatorManager
 import com.yuri.love.share.NavigatorManager.drawerItems
@@ -326,7 +326,7 @@ private fun StatCard(label: String, value: String, modifier: Modifier = Modifier
             label,
             fontSize = 12.sp,
             color = Color(0xFF8B5A96),
-            fontFamily = GlobalFonts.MapleMonoFont
+            fontFamily = GlobalStyle.MapleMonoFont
         )
     }
 }

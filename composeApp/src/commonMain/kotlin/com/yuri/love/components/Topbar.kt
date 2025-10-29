@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.yuri.love.share.GlobalColors
+import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.views.create.CreateScreen
 import com.yuri.love.views.home.components.LocalDrawerController
@@ -49,7 +49,7 @@ fun TopBar() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(GlobalColors.tapBarBackground)
+                .background(GlobalStyle.tapBarBackground)
                 .blur(radius = 10.dp)
         )
         Box(modifier = Modifier.padding(start = 3.dp, end = 3.dp).fillMaxSize()) {
