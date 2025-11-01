@@ -161,7 +161,7 @@ fun JournalListScreen(journals: List<Journal>) {
             )
         }
 
-        items(journals) { journal ->
+        items(journals, key = { it.id }) { journal ->
             AnimatedJournalItem(journal) {
                 selectedJournal = journal
             }

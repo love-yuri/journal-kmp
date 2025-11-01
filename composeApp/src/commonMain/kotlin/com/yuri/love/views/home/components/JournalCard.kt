@@ -29,6 +29,7 @@ import com.yuri.love.share.GlobalStyle
 import com.yuri.love.utils.TimeUtils.formatTimestampDay
 import com.yuri.love.utils.TimeUtils.formatTimestampTime
 import com.yuri.love.views.create.CreateScreen
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.date
 import journal.composeapp.generated.resources.weather_sun
@@ -74,8 +75,6 @@ fun JournalCardComposable(
         label = "shadow"
     )
 
-
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -109,6 +108,7 @@ fun JournalCardComposable(
                             navigator?.push(CreateScreen(journal))
                         },
                         onLongPress = {
+                            logger {}.info { "长按: ${journal.title}" }
                             onDelete?.invoke(journal)
                         }
                     )

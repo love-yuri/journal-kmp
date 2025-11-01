@@ -40,5 +40,7 @@ const val TempRestoreFilePrefix = "temp_restore"
  */
 const val TempRestoreFileSuffix = "db"
 
-
-
+/**
+ * 自动备份文件名
+ */
+const val AutoBackupFileName = "auto_backup.db"
