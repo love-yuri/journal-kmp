@@ -1,11 +1,13 @@
 package com.yuri.love.views.create
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -155,41 +157,42 @@ class CreateScreen(val journal: Journal? = null): Screen {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // 标题输入区域 - 固定高度
-                Box(
+
+                BasicTextField(
+                    value = title,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 6.dp)
                         .height(52.dp)
-                ) {
-                    BasicTextField(
-                        value = title,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.CenterStart),
-                        onValueChange = { title = it },
-                        singleLine = true,
-                        textStyle = LocalTextStyle.current.copy(
-                            fontSize = 26.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = textPrimary
-                        ),
-                        cursorBrush = SolidColor(primaryColor),
-                        decorationBox = { innerTextField ->
-                            Box(modifier = Modifier.fillMaxWidth()) {
-                                if (title.isEmpty()) {
-                                    Text(
-                                        text = "标题",
-                                        fontSize = 26.sp,
-                                        color = textTertiary,
-                                        fontWeight = FontWeight.Normal
-                                    )
-                                }
-                                innerTextField()
-                            }
-                        }
-                    )
-                }
+                        .wrapContentHeight(Alignment.CenterVertically),
 
-                Spacer(modifier = Modifier.height(12.dp))
+                    onValueChange = { title = it },
+                    singleLine = true,
+                    textStyle = LocalTextStyle.current.copy(
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = textPrimary,
+                        lineHeight = 28.sp,
+                        textAlign = TextAlign.Start
+                    ),
+                    cursorBrush = SolidColor(primaryColor),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            if (title.isEmpty()) {
+                                Text(
+                                    text = "标题",
+                                    fontSize = 24.sp,
+                                    color = textTertiary,
+                                    fontWeight = FontWeight.Normal,
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
+                )
+
 
                 // 装饰性分割线
                 Row(
