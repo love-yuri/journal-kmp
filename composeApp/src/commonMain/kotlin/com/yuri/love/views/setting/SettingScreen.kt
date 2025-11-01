@@ -22,16 +22,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import com.yuri.love.components.SimpleTopBar
+import com.yuri.love.database.SystemConfig
 import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.NavigatorManager.ScreenPageType
+import com.yuri.love.utils.PlatformUtils
 
 class SettingScreen : Screen {
     @Composable
     override fun Content() {
-        var fingerprintEnabled by remember { mutableStateOf(false) }
-        var pinLoginEnabled by remember { mutableStateOf(false) }
-        var autoBackupEnabled by remember { mutableStateOf(true) }
+        var fingerprintEnabled by remember { mutableStateOf(SystemConfig.FingerprintEnabled) }
+        var pinLoginEnabled by remember { mutableStateOf(SystemConfig.PinLoginEnabled) }
+        var autoBackupEnabled by remember { mutableStateOf(SystemConfig.AutoBackup) }
         var notificationEnabled by remember { mutableStateOf(true) }
         var darkModeEnabled by remember { mutableStateOf(false) }
 
@@ -64,8 +66,14 @@ class SettingScreen : Screen {
                         title = "指纹认证",
                         subtitle = "使用指纹快速解锁应用",
                         checked = fingerprintEnabled,
-                        onCheckedChange = { fingerprintEnabled = it }
-                    )
+                    ) {
+                        PlatformSettings.setFingerprintEnabled(it) { res ->
+                            if (res == it) {
+                                fingerprintEnabled = res
+                                SystemConfig.FingerprintEnabled = res
+                            }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -74,19 +82,27 @@ class SettingScreen : Screen {
                         title = "PIN码登录",
                         subtitle = "使用PIN码作为备用登录方式",
                         checked = pinLoginEnabled,
-                        onCheckedChange = { pinLoginEnabled = it }
-                    )
+                    ) {
+                        PlatformSettings.setPinLoginEnabled(it) { res ->
+                            if (res == it) {
+                                pinLoginEnabled = res
+                                SystemConfig.PinLoginEnabled = res
+                            }
+                        }
+                    }
                 }
 
                 // 数据管理区域
                 SettingSection(title = "数据管理") {
                     SettingItemSwitch(
                         icon = Icons.Default.CloudSync,
-                        title = "关闭时自动备份",
-                        subtitle = "退出应用时自动同步备份数据",
-                        checked = autoBackupEnabled,
-                        onCheckedChange = { autoBackupEnabled = it }
-                    )
+                        title = "Webdav自动备份",
+                        subtitle = "修改数据时同步备份数据到Webdav",
+                        checked = autoBackupEnabled
+                    ) {
+                        autoBackupEnabled = it
+                        SystemConfig.AutoBackup = it
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
