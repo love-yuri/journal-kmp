@@ -32,6 +32,28 @@ object SystemConfig {
         set(value) = set("isLoggedIn", value)
 
     /**
+     * 是否开启指纹认证
+     */
+    var FingerprintEnabled: Boolean
+        get() = get("FingerprintEnabled").toBoolean()
+        set(value) = set("FingerprintEnabled", value)
+
+    /**
+     * 是否开启PIN码登录
+     */
+    var PinLoginEnabled: Boolean
+        get() = get("PinLoginEnabled").toBoolean()
+        set(value) = set("PinLoginEnabled", value)
+
+
+    /**
+     * 是否自动备份
+     */
+    var AutoBackup: Boolean
+        get() = get("AutoBackup").toBoolean()
+        set(value) = set("AutoBackup", value)
+
+    /**
      * 开始记录日记时间
      * 该值由建表时写入
      */
