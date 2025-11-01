@@ -10,9 +10,9 @@ import app.cash.sqldelight.db.SqlDriver
 import com.yuri.love.Database
 import com.yuri.love.Journal
 import com.yuri.love.JournalInfo
-import com.yuri.love.JournalQueries
 import com.yuri.love.database.JournalService.JournalBackupType.*
 import com.yuri.love.retrofit.WebDavService
+import com.yuri.love.share.AutoBackupFileName
 import com.yuri.love.share.DatabaseBackupSuffix
 import com.yuri.love.share.DatabaseSuffix
 import com.yuri.love.share.JournalDatabaseName
@@ -27,12 +27,15 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.io.File
+import kotlin.math.max
 
 val log = logger {}
 
@@ -74,17 +77,13 @@ object JournalService {
     private val _journals = MutableStateFlow<List<Journal>>(emptyList())
     private val factory by lazy { DriverFactory.create() }
     private val _journalInfo = MutableStateFlow(JournalInfo(0, 0))
-
-    private val driver: SqlDriver by lazy {
-        factory.createDriver(JournalDatabaseName)
-    }
+    private var driver: SqlDriver = factory.createDriver(JournalDatabaseName)
+    private val _currentQuery = MutableStateFlow(Database(driver).journalQueries)
 
     /**
      * 查询器
      */
-    private val query: JournalQueries by lazy {
-        Database(driver).journalQueries
-    }
+    val currentQuery = _currentQuery.asStateFlow()
 
     /**
      * 所有日记
@@ -99,70 +98,64 @@ object JournalService {
     init {
         // 监听页码变化，自动加载对应页数据
         scope.launch {
-            _currentPage.collect { page ->
+            _currentPage.drop(1).collect { page ->
                 loadPage(page)
             }
         }
 
         scope.launch {
-            query.journalInfo()
+            initQuery()
+        }
+    }
+
+    private suspend fun initQuery() {
+        currentQuery.collectLatest { queries ->
+            queries.journalInfo()
                 .asFlow()
                 .mapToOne(Dispatchers.IO)
                 .collect {
                     _journalInfo.value = it
-                    if (it.total != 0L) {
-                        refresh()
-                    }
+                    refresh()
                 }
         }
     }
 
-    // 加载指定页数据
-    private suspend fun loadPage(page: Long) {
-        val offset = page * SIZE
-        query.page(SIZE, offset)
-            .asFlow()
-            .mapToList(Dispatchers.IO)
-            .distinctUntilChanged() // 避免重复数据触发更新
-            .first() // 只取第一次结果，避免持续监听
-            .let { data ->
-                if (page == 0L) {
-                    _journals.update { data }
-                } else {
-                    _journals.update { _journals.value + data }
-                }
+    /**
+     * 自动备份
+     */
+    private fun autoBackup() {
+        scope.launch {
+            if (!SystemConfig.AutoBackup || !SystemConfig.isLoggedIn) {
+                return@launch
             }
+            val file = File(factory.path(JournalDatabaseName))
+            if (WebDavService.upload(file, AutoBackupFileName)) {
+                Notification.notificationState?.success("自动备份成功")
+            }
+        }
+    }
+
+    // 加载指定页数据
+    private fun loadPage(page: Long) {
+        val offset = page * SIZE
+        val data = _currentQuery.value
+            .page(SIZE, offset)
+            .executeAsList()
+
+        if (page == 0L) {
+            _journals.update { data }
+        } else {
+            _journals.update { it + data }
+        }
     }
 
     // 刷新
-    suspend fun refresh() {
+    fun refresh() {
         if (_currentPage.value != 0L) {
             _currentPage.update { 0 }
         } else {
             loadPage(0L)
         }
-    }
-
-    /**
-     * update journal
-     */
-    fun update(journal: Journal): Boolean {
-        return query.updateById (
-            journal.title,
-            journal.content,
-            journal.mood,
-            journal.weather,
-            TimeUtils.now,
-            journal.id
-        ).value > 0
-    }
-
-    fun insert(journal: Journal): Boolean {
-        return query.insert(journal).value > 0
-    }
-
-    fun delete(journal: Journal): Boolean {
-        return query.deleteById(journal.id).value > 0
     }
 
     /**
@@ -172,6 +165,56 @@ object JournalService {
         if (_journalInfo.value.total > _journals.value.size) {
             _currentPage.update { it + 1 }
         }
+    }
+
+    /**
+     * update journal
+     */
+    fun update(journal: Journal): Boolean {
+        val res = _currentQuery.value.updateById (
+            journal.title,
+            journal.content,
+            journal.mood,
+            journal.weather,
+            TimeUtils.now,
+            journal.id
+        ).value > 0
+        if (res) {
+            autoBackup()
+        } else {
+            val displayTitle = journal.title?.take(6)?.let {
+                if (journal.title.length > 6) "$it..." else it
+            }
+            Notification.notificationState?.error("${displayTitle}: 更新失败!")
+        }
+        return res
+    }
+
+    fun insert(journal: Journal): Boolean {
+        val res = _currentQuery.value.insert(journal).value > 0
+        if (res) {
+            autoBackup()
+        } else {
+            val displayTitle = journal.title?.take(6)?.let {
+                if (journal.title.length > 6) "$it..." else it
+            }
+
+            Notification.notificationState?.error("${displayTitle}: 插入失败!")
+        }
+        return res
+    }
+
+    fun delete(journal: Journal): Boolean {
+        val res = _currentQuery.value.deleteById(journal.id).value > 0
+        if (res) {
+            autoBackup()
+        } else {
+            val displayTitle = journal.title?.take(6)?.let {
+                if (journal.title.length > 6) "$it..." else it
+            }
+            Notification.notificationState?.error("${displayTitle}: 删除失败!")
+        }
+        return res
     }
 
     /**
@@ -232,7 +275,7 @@ object JournalService {
      */
     fun backupAll() {
         try {
-            val info = createBackupFile(JournalBackupType.Local)
+            val info = createBackupFile(Local)
             localBackup(info)
             webdavBackup(info)
         } catch (e: Exception) {
@@ -257,10 +300,14 @@ object JournalService {
      * @param file 备份信息
      */
     fun restoreFromFile(file: File) {
+        driver.close()
+        driver = factory.createDriver(JournalDatabaseName)
+        _currentQuery.update { Database(driver).journalQueries }
+
         file.copyTo(File(factory.path(JournalDatabaseName)), overwrite = true)
 
         scope.launch {
-            _journalInfo.value = query.journalInfo().executeAsOne()
+            initQuery()
             refresh()
         }
     }
