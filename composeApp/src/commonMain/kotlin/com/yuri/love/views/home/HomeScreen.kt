@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,6 +32,7 @@ import com.yuri.love.views.home.components.DiaryHeaderAdvanced
 import com.yuri.love.views.home.components.JournalCardComposable
 import com.yuri.love.components.TopBar
 import com.yuri.love.share.GlobalStyle
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -86,7 +88,7 @@ fun JournalListScreen(journals: List<Journal>) {
     val scope = rememberCoroutineScope()
 
     // 下拉刷新阈值
-    val refreshThreshold = 120f
+    val refreshThreshold = 140f
     val maxPullDistance = 200f
 
     val animatedOffset by animateFloatAsState(
@@ -129,9 +131,26 @@ fun JournalListScreen(journals: List<Journal>) {
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { },
-                    onDragEnd = {
+                awaitPointerEventScope {
+                    while (true) {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        var dragStartY = down.position.y
+
+                        do {
+                            val event = awaitPointerEvent()
+                            event.changes.forEach { change ->
+                                if (listState.firstVisibleItemIndex == 0 &&
+                                    listState.firstVisibleItemScrollOffset <= 0) {
+
+                                    val dragAmount = change.position.y - dragStartY
+                                    val newY = (y + dragAmount * 0.4f).coerceAtLeast(0f)
+                                    y = newY.coerceAtMost(maxPullDistance)
+
+                                    dragStartY = change.position.y
+                                }
+                            }
+                        } while (event.changes.any { it.pressed })
+
                         if (y >= refreshThreshold && !isRefreshing) {
                             scope.launch {
                                 isRefreshing = true
@@ -143,11 +162,6 @@ fun JournalListScreen(journals: List<Journal>) {
                         } else {
                             y = 0f
                         }
-                    }
-                ) { _, dragAmount ->
-                    if (listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset <= 0) {
-                        val newY = (y + dragAmount.y * 0.5f).coerceAtLeast(0f)
-                        y = newY.coerceAtMost(maxPullDistance)
                     }
                 }
             }
