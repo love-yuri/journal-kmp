@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.yuri.love.AppContext
 import com.yuri.love.Database
 import com.yuri.love.share.DatabaseSuffix
 
@@ -13,10 +14,7 @@ actual class DriverFactory(private val context: Context) {
     }
 
     actual companion object {
-        @SuppressLint("StaticFieldLeak")
-        var context: Context? = null
-
-        actual fun create(): DriverFactory = DriverFactory(context!!)
+        actual fun create(): DriverFactory = DriverFactory(AppContext.mainActivity)
     }
 
     actual fun path(name: String): String {
