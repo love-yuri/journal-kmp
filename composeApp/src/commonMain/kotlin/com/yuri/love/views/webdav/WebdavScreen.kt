@@ -36,6 +36,7 @@ import com.yuri.love.database.SystemConfig
 import com.yuri.love.retrofit.WebDavService
 import com.yuri.love.retrofit.WebDavService.WebdavFile
 import com.yuri.love.share.DatabaseBackupSuffix
+import com.yuri.love.share.DatabaseSuffix
 import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.JournalDatabaseName
@@ -182,7 +183,7 @@ private fun WebdavScreenContent() {
                                 }
                             },
                             onFileDownload = { file ->
-                                if (file.fileName.startsWith("${JournalDatabaseName}${DatabaseBackupSuffix}")) {
+                                if (file.fileName.endsWith(DatabaseSuffix)) {
                                     selectedBackupFile = file
                                 }
                             }
