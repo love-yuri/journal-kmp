@@ -5,10 +5,11 @@ import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentActivity
+import com.yuri.love.AppContext
 import java.util.concurrent.Executor
 
-class BiometricAuth(private val activity: FragmentActivity) {
+class BiometricAuth() {
+    val activity get() = AppContext.mainActivity
 
     fun isBiometricAvailable(): Boolean {
         val biometricManager = BiometricManager.from(activity)
@@ -20,14 +21,12 @@ class BiometricAuth(private val activity: FragmentActivity) {
 
     fun authenticate(
         title: String,
-        subtitle: String,
-        negativeButtonText: String,
         onSuccess: () -> Unit,
         onError: (Int, String) -> Unit,
-        onFailed: () -> Unit
+        onFailed: () -> Unit,
+        type: Int = BIOMETRIC_STRONG
     ) {
         val executor: Executor = ContextCompat.getMainExecutor(activity)
-
         val callback = object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(
                 result: BiometricPrompt.AuthenticationResult
@@ -53,10 +52,12 @@ class BiometricAuth(private val activity: FragmentActivity) {
         val biometricPrompt = BiometricPrompt(activity, executor, callback)
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(title)
-            .setSubtitle(subtitle)
-            .setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
-            .build()
+            .setAllowedAuthenticators(type)
 
-        biometricPrompt.authenticate(promptInfo)
+        if (type and DEVICE_CREDENTIAL == 0) {
+            promptInfo.setNegativeButtonText("取消")
+        }
+
+        biometricPrompt.authenticate(promptInfo.build())
     }
 }
