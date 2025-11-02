@@ -27,6 +27,7 @@ import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.NavigatorManager.ScreenPageType
 import com.yuri.love.utils.PlatformUtils
+import com.yuri.love.utils.notification.Notification
 
 class SettingScreen : Screen {
     @Composable
@@ -102,6 +103,7 @@ class SettingScreen : Screen {
                     ) {
                         autoBackupEnabled = it
                         SystemConfig.AutoBackup = it
+                        Notification.notificationState?.success("自动备份已 ${if (it) "开启" else "关闭"}")
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
