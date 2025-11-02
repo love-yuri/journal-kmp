@@ -129,8 +129,8 @@ object JournalService {
                 return@launch
             }
             val file = File(factory.path(JournalDatabaseName))
-            if (WebDavService.upload(file, AutoBackupFileName)) {
-                Notification.notificationState?.success("自动备份成功")
+            if (!WebDavService.upload(file, AutoBackupFileName)) {
+                Notification.notificationState?.error("自动备份失败!")
             }
         }
     }

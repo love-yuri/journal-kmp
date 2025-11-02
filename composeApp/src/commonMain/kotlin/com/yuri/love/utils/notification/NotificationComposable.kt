@@ -67,9 +67,9 @@ private fun NotificationComposable(
     }
 
     val animationDuration = when (notification.type) {
-        NotificationType.Error -> 4000 // Errors stay longer
-        NotificationType.Warning -> 3000 // Warnings stay a bit longer
-        else -> 2000 // Info and Success
+        NotificationType.Error -> 2300 // Errors stay longer
+        NotificationType.Warning -> 1800 // Warnings stay a bit longer
+        else -> 600 // Info and Success
     }
 
     LaunchedEffect(notification.id) {
