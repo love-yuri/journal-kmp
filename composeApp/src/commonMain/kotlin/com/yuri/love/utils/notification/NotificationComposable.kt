@@ -1,46 +1,23 @@
 package com.yuri.love.utils.notification
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
@@ -96,7 +73,7 @@ private fun NotificationComposable(
     }
 
     LaunchedEffect(notification.id) {
-        process.animateTo (
+        process.animateTo(
             1f,
             animationSpec = tween(
                 easing = LinearEasing,
@@ -108,44 +85,58 @@ private fun NotificationComposable(
 
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .fillMaxWidth(0.7f)
-            .height(38.dp)
-            .background(color = backgroundColor.copy(alpha = 0.95f))
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp) // 添加左右边距，避免贴边
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+                .shadow(
+                    elevation = 4.dp,
+                    shape = RoundedCornerShape(12.dp),
+                    clip = false
+                )
+                .clip(RoundedCornerShape(12.dp))
+                .fillMaxWidth()
+                .background(color = backgroundColor.copy(alpha = 0.96f))
         ) {
-            // Icon
-            NotificationIcon(
-                type = notification.type,
-                modifier = Modifier.padding(end = 8.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp), // 增加内边距
+                verticalAlignment = Alignment.Top, // 改为顶部对齐，适配多行文本
+                horizontalArrangement = Arrangement.Start
+            ) {
+                // Icon - 固定在顶部
+                NotificationIcon(
+                    type = notification.type,
+                    modifier = Modifier
+                        .padding(end = 12.dp, top = 2.dp) // 图标顶部微调
+                )
 
-            // Content
-            Text(
-                text = notification.content,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.weight(1f)
+                // Content - 支持多行
+                Text(
+                    text = notification.content,
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.weight(1f),
+                    lineHeight = 20.sp, // 设置行高
+                    maxLines = 3, // 最多3行
+                    overflow = TextOverflow.Ellipsis // 超出显示省略号
+                )
+            }
+
+            // Progress bar at the bottom
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(3.dp)
+                    .align(Alignment.BottomCenter),
+                progress = { process.value },
+                color = progressColor,
+                trackColor = Color.Transparent
             )
         }
-
-        // Progress bar at the bottom
-        LinearProgressIndicator(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(3.dp)
-                .align(Alignment.BottomCenter),
-            progress = { process.value },
-            color = progressColor,
-            trackColor = Color.Transparent
-        )
     }
 }
 
@@ -155,7 +146,8 @@ fun PreviewAllNotificationTypes() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .background(Color(0xFFF5F5F5))
+            .padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         NotificationComposable(
@@ -169,7 +161,7 @@ fun PreviewAllNotificationTypes() {
         NotificationComposable(
             notification = Notification(
                 id = 2,
-                content = "操作成功",
+                content = "操作成功完成，所有数据已保存",
                 type = NotificationType.Success
             )
         )
@@ -177,7 +169,7 @@ fun PreviewAllNotificationTypes() {
         NotificationComposable(
             notification = Notification(
                 id = 3,
-                content = "警告信息",
+                content = "警告：您的存储空间即将用完，请及时清理不必要的文件以确保系统正常运行",
                 type = NotificationType.Warning
             )
         )
@@ -185,7 +177,7 @@ fun PreviewAllNotificationTypes() {
         NotificationComposable(
             notification = Notification(
                 id = 4,
-                content = "错误提示",
+                content = "错误：网络连接失败，请检查您的网络设置后重试",
                 type = NotificationType.Error
             )
         )
@@ -220,9 +212,9 @@ private fun NotificationComposable(
         )
     )
 
-    // 添加弹性缩放效果
+    // 优化缩放效果
     val scale by animateFloatAsState(
-        targetValue = if (isRemoving) 0.8f else 1f,
+        targetValue = if (isRemoving) 0.85f else 1f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
@@ -231,8 +223,14 @@ private fun NotificationComposable(
 
     // 旋转效果
     val rotation by animateFloatAsState(
-        targetValue = if (isRemoving) 10f else 0f,
+        targetValue = if (isRemoving) 3f else 0f,
         animationSpec = tween(200)
+    )
+
+    // 退出时的透明度动画
+    val alpha by animateFloatAsState(
+        targetValue = if (isRemoving) 0f else 1f,
+        animationSpec = tween(250)
     )
 
     AnimatedVisibility(
@@ -253,11 +251,11 @@ private fun NotificationComposable(
             animationSpec = tween(300, delayMillis = 100)
         ),
         exit = slideOutVertically(
-            targetOffsetY = { it / 2 },
-            animationSpec = tween(300, easing = FastOutSlowInEasing)
+            targetOffsetY = { -it / 2 }, // 向上滑出
+            animationSpec = tween(250, easing = FastOutSlowInEasing)
         ) + shrinkVertically(
-            shrinkTowards = Alignment.CenterVertically,
-            animationSpec = tween(300)
+            shrinkTowards = Alignment.Top, // 从顶部收缩
+            animationSpec = tween(250)
         ) + fadeOut(
             animationSpec = tween(200)
         )
@@ -269,6 +267,7 @@ private fun NotificationComposable(
                     scaleY = scale
                     rotationZ = rotation
                     translationY = offsetY
+                    this.alpha = alpha
                 }
         ) {
             NotificationComposable(
@@ -290,7 +289,11 @@ fun NotificationContainer(modifier: Modifier) {
     }
 
     Box(modifier = modifier) {
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp), // 使用统一间距
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             items(list, key = { it.id }) { item ->
                 NotificationComposable(
                     notification = item,
@@ -304,10 +307,6 @@ fun NotificationContainer(modifier: Modifier) {
                         Notification.notificationState?.removeNotification(item.id)
                         removingItems.value -= item.id
                     }
-                }
-                // 只在通知可见时才显示间距
-                if (!removingItems.value.contains(item.id)) {
-                    Spacer(modifier = Modifier.height(5.dp))
                 }
             }
         }
