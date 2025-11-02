@@ -147,7 +147,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = version.toString()
     }
     packaging {
         resources {
@@ -211,7 +211,7 @@ abstract class GenerateVersionFile : DefaultTask() {
 }
 
 tasks.register<GenerateVersionFile>("generateVersionFile") {
-    versionName.set(project.version.toString())
+    versionName.set("v${project.version} ${gitVersionProvider.get()}")
     outputDir.set(layout.buildDirectory.dir("generated/commonMain/kotlin"))
     packageName.set(rootPackageName)
 }
