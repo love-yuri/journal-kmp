@@ -64,7 +64,7 @@ object NavigatorManager {
         EnhancedDrawerMenuItem(ScreenPageType.Home,"所有日记", Icons.Outlined.Home, { HomeScreen() }),
         EnhancedDrawerMenuItem(ScreenPageType.Webdav,"Webdav网盘", Icons.Outlined.Explore, { WebdavScreen() }),
         EnhancedDrawerMenuItem(ScreenPageType.Backup, "备份和恢复", Icons.Outlined.Backup, { BackupScreen() }),
-        EnhancedDrawerMenuItem(ScreenPageType.Test, "测试页面", Icons.Outlined.Yard, { TestScreen() }),
+//        EnhancedDrawerMenuItem(ScreenPageType.Test, "测试页面", Icons.Outlined.Yard, { TestScreen() }),
         EnhancedDrawerMenuItem(ScreenPageType.Setting, "系统设置", Icons.Outlined.Settings, { SettingScreen() })
     )
 

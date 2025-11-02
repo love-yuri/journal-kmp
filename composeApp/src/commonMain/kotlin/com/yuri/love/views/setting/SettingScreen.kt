@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import com.yuri.love.components.SimpleTopBar
 import com.yuri.love.database.SystemConfig
+import com.yuri.love.share.AppVersion
 import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.NavigatorManager.ScreenPageType
@@ -154,7 +155,7 @@ class SettingScreen : Screen {
                     SettingItemButton(
                         icon = Icons.Default.Info,
                         title = "版本信息",
-                        subtitle = "v1.0.0"
+                        subtitle = AppVersion
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))

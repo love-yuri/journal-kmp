@@ -1,5 +1,7 @@
 package com.yuri.love.share
 
+import com.yuri.love.ProjectVersionInfo
+
 /**
  * 数据库文件后缀
  */
@@ -44,3 +46,13 @@ const val TempRestoreFileSuffix = "db"
  * 自动备份文件名
  */
 const val AutoBackupFileName = "auto_backup.db"
+
+/**
+ * app名称
+ */
+const val AppName = "心情日记"
+
+/**
+ * app版本
+ */
+const val AppVersion = ProjectVersionInfo.VERSION

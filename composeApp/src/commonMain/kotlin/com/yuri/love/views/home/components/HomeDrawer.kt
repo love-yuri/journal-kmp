@@ -27,6 +27,8 @@ import com.yuri.love.JournalInfo
 import com.yuri.love.database.JournalService
 import com.yuri.love.database.SystemConfig
 import com.yuri.love.database.SystemConfig.get
+import com.yuri.love.share.AppName
+import com.yuri.love.share.AppVersion
 import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
 import com.yuri.love.share.NavigatorManager
@@ -449,7 +451,7 @@ private fun EnhancedDrawerFooter() {
 
         // 版本信息
         Text(
-            text = "心情日记 v1.0.0",
+            text = "$AppName $AppVersion",
             fontSize = 12.sp,
             color = Color(0xFF8B5A96),
             textAlign = TextAlign.Center,
