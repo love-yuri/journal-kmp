@@ -18,11 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.yuri.love.Journal
@@ -34,10 +37,14 @@ import com.yuri.love.utils.TimeUtils.nowTime
 import com.yuri.love.utils.algorithm.SnowFlake
 import com.yuri.love.utils.notification.Notification
 import com.yuri.love.utils.platformSafeTopPadding
+import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.math.log
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.time.ExperimentalTime
 
 private val primaryColor = Color(0xFFFFB6C1)
@@ -50,6 +57,7 @@ private val dividerColor = Color(0xFFE5E7EB)
 class CreateScreen(val journal: Journal? = null): Screen {
     private val isUpdate get() = journal != null
 
+    @Suppress("AutoboxingStateCreation")
     @Preview
     @Composable
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
@@ -57,8 +65,10 @@ class CreateScreen(val journal: Journal? = null): Screen {
         val navigator = LocalNavigator.current
 
         var title by remember { mutableStateOf(journal?.title ?: "")  }
-        var content by remember { mutableStateOf(journal?.content ?: "") }
+        var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+        var textFieldValue by remember { mutableStateOf(TextFieldValue(journal?.content ?: "")) }
         val scrollState = rememberScrollState()
+        var targetScrollValue by remember { mutableIntStateOf(0) }
         val currentDate = remember {
             val localDate = nowTime.toLocalDateTime(TimeZone.currentSystemDefault()).date
             "${localDate.month.number}/${localDate.day}"
@@ -67,6 +77,10 @@ class CreateScreen(val journal: Journal? = null): Screen {
         val imeInsets = WindowInsets.ime
         val imeBottom = with(LocalDensity.current) {
             imeInsets.getBottom(this).toDp()
+        }
+
+        LaunchedEffect(targetScrollValue) {
+            scrollState.animateScrollTo(targetScrollValue)
         }
 
         Column(
@@ -126,9 +140,9 @@ class CreateScreen(val journal: Journal? = null): Screen {
                         onClick = {
                             try {
                                 if (isUpdate) {
-                                    updateJournal(journal, title, content)
+                                    updateJournal(journal, title, textFieldValue.text)
                                 } else {
-                                    addJournal(title, content)
+                                    addJournal(title, textFieldValue.text)
                                 }
                                 navigator?.pop()
                             } catch (e: Exception) {
@@ -193,7 +207,6 @@ class CreateScreen(val journal: Journal? = null): Screen {
                     }
                 )
 
-
                 // 装饰性分割线
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -220,12 +233,7 @@ class CreateScreen(val journal: Journal? = null): Screen {
                     )
                 }
 
-                // 内容编辑区域
-                LaunchedEffect(content) {
-                    scrollState.animateScrollTo(scrollState.maxValue)
-                }
-
-                Box(
+                BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = 4.dp)
@@ -234,20 +242,52 @@ class CreateScreen(val journal: Journal? = null): Screen {
                             shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
                         )
                 ) {
+                    val maxHeight = this.maxHeight
+                    val lineHeight = 24
+
                     BasicTextField(
-                        value = content,
-                        onValueChange = { content = it },
+                        value = textFieldValue,
+                        onValueChange = {
+                            textFieldValue = it
+
+                            textLayoutResult?.let { layoutResult ->
+                                val cursorLine = layoutResult.getLineForOffset(it.selection.start)
+
+                                val lineTop = layoutResult.getLineTop(cursorLine)
+                                val lineBottom = layoutResult.getLineBottom(cursorLine)
+
+                                // 获取可视区域的范围
+                                val viewportTop = scrollState.value.toFloat()
+                                val viewportBottom = viewportTop + maxHeight.value
+
+                                when {
+                                    // 光标在可视区域上方
+                                    lineTop < viewportTop -> {
+                                        targetScrollValue = lineTop.toInt()
+                                    }
+                                    // 光标在可视区域下方
+                                    lineBottom > viewportBottom -> {
+                                        targetScrollValue = (lineBottom - maxHeight.value).toInt()
+                                    }
+                                }
+                            }
+                        },
+                        onTextLayout = {
+                            textLayoutResult = it
+                        },
                         textStyle = TextStyle(
                             fontSize = 16.sp,
                             color = textPrimary,
-                            lineHeight = 24.sp
+                            lineHeight = lineHeight.sp
                         ),
                         cursorBrush = SolidColor(primaryColor),
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(4.dp),
+                            .padding(4.dp)
+                            .verticalScroll(scrollState),
+
                         decorationBox = { innerTextField ->
-                            if (content.isEmpty()) {
+                            if (textFieldValue.text.isEmpty()) {
                                 Text(
                                     text = "写点什么...",
                                     color = textTertiary,
@@ -257,11 +297,43 @@ class CreateScreen(val journal: Journal? = null): Screen {
                             innerTextField()
                         }
                     )
+
+                    // 自定义滚动条
+                    if (scrollState.maxValue > 0) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(3.dp)
+                                .align(Alignment.TopEnd)
+                        ) {
+                            val progress = scrollState.value / scrollState.maxValue.toFloat()
+                            val containerHeight = maxHeight
+
+                            // 根据可滚动内容的比例动态计算滚动条高度
+                            val totalContentHeight = containerHeight + scrollState.maxValue.dp
+                            val thumbHeight = (containerHeight / totalContentHeight * containerHeight)
+                                .coerceIn(20.dp, containerHeight * 0.5f)
+
+                            // 计算滚动条可移动的范围
+                            val scrollableRange = containerHeight - thumbHeight
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(thumbHeight)
+                                    .offset(y = scrollableRange * progress)
+                                    .background(
+                                        color = primaryColor.copy(alpha = 0.6f),
+                                        shape = RoundedCornerShape(2.dp)
+                                    )
+                            )
+                        }
+                    }
                 }
             }
 
             // 底部状态栏
-            ToolbarWithIme(content)
+            ToolbarWithIme(textFieldValue.text)
         }
     }
 }
