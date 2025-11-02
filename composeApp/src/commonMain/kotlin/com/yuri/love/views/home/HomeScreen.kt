@@ -143,7 +143,7 @@ fun JournalListScreen(journals: List<Journal>) {
                                     listState.firstVisibleItemScrollOffset <= 0) {
 
                                     val dragAmount = change.position.y - dragStartY
-                                    val newY = (y + dragAmount * 0.4f).coerceAtLeast(0f)
+                                    val newY = (y + dragAmount * 0.2f).coerceAtLeast(0f)
                                     y = newY.coerceAtMost(maxPullDistance)
 
                                     dragStartY = change.position.y

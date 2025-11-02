@@ -103,7 +103,7 @@ private fun NotificationComposable(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp), // 增加内边距
-                verticalAlignment = Alignment.Top, // 改为顶部对齐，适配多行文本
+                verticalAlignment = Alignment.CenterVertically, // 改为顶部对齐，适配多行文本
                 horizontalArrangement = Arrangement.Start
             ) {
                 // Icon - 固定在顶部
