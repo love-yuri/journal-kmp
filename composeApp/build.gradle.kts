@@ -2,6 +2,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import app.cash.sqldelight.gradle.SqlDelightDatabase
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -13,6 +14,14 @@ plugins {
     kotlin("plugin.serialization") version "2.2.0"
 }
 
+val rootPackageName = "com.yuri.love"
+
+val gitVersionProvider = providers.exec {
+    commandLine("git", "describe", "--always", "--dirty")
+}.standardOutput.asText.map { it.trim() }
+
+version = project.findProperty("AppVersion") as String
+
 /* 数据库配置 */
 repositories {
     google()
@@ -21,9 +30,10 @@ repositories {
 
 sqldelight {
     databases {
-        create("Database") {
-            packageName.set("com.yuri.love")
+        val action = Action<SqlDelightDatabase> {
+            packageName = rootPackageName
         }
+        create("Database", action)
     }
 }
 
@@ -49,12 +59,17 @@ kotlin {
     jvm()
     
     sourceSets {
+        val commonMain by getting {
+            kotlin.srcDir(layout.buildDirectory.dir("generated/commonMain/kotlin"))
+        }
+
         androidMain.dependencies {
             implementation(libs.android.driver)
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.biometric)
         }
+
         commonMain.dependencies {
             /* xml */
             implementation(libs.core)
@@ -128,7 +143,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.yuri.love"
+        applicationId = rootPackageName
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -160,12 +175,48 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.yuri.love.MainKt"
+        mainClass = "$rootPackageName.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.yuri.love"
-            packageVersion = "1.0.0"
+            packageName = rootPackageName
         }
     }
+}
+
+abstract class GenerateVersionFile : DefaultTask() {
+    @get:Input
+    abstract val versionName: Property<String>
+
+    @get:Input
+    abstract val packageName: Property<String>
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun generate() {
+        val file = outputDir.get().file("com/yuri/love/VersionInfo.kt").asFile
+        file.parentFile.mkdirs()
+        file.writeText(
+            """
+            package ${packageName.get()}
+
+            object ProjectVersionInfo {
+                const val VERSION = "${versionName.get()}"
+            }
+            """.trimIndent()
+        )
+    }
+}
+
+tasks.register<GenerateVersionFile>("generateVersionFile") {
+    versionName.set(project.version.toString())
+    outputDir.set(layout.buildDirectory.dir("generated/commonMain/kotlin"))
+    packageName.set(rootPackageName)
+}
+
+// 更精确地指定到 Kotlin 编译任务
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    dependsOn("generateVersionFile")
 }
