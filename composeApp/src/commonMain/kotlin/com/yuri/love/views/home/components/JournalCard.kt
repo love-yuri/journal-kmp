@@ -195,7 +195,7 @@ fun JournalCardComposable(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         MetaInfoItem(
                             icon = Res.drawable.date,
-                            text = formatTimestampDay(journal.createdAt),
+                            text = formatTimestampDay(journal.updatedAt),
                             tint = Color(0xFFFF69B4)
                         )
 

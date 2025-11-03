@@ -70,6 +70,9 @@ class CreateScreen(val journal: Journal? = null): Screen {
         val scrollState = rememberScrollState()
         var targetScrollValue by remember { mutableIntStateOf(0) }
         val currentDate = remember {
+            if (journal != null) {
+                return@remember TimeUtils.formatTimestampDay(journal.createdAt)
+            }
             val localDate = nowTime.toLocalDateTime(TimeZone.currentSystemDefault()).date
             "${localDate.month.number}/${localDate.day}"
         }
@@ -129,7 +132,7 @@ class CreateScreen(val journal: Journal? = null): Screen {
                                 .background(textSecondary.copy(alpha = 0.3f), CircleShape)
                         )
                         Text(
-                            text = GlobalValue.weather,
+                            text = journal?.weather ?: GlobalValue.weather,
                             fontSize = 13.sp,
                             color = textSecondary
                         )
