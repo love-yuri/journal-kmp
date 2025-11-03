@@ -1,9 +1,5 @@
 package com.yuri.love.database
 
-import com.yuri.love.Database
-import com.yuri.love.SystemConfig
-import com.yuri.love.SystemConfigQueries
-import com.yuri.love.share.SystemConfigDatabaseName
 import com.yuri.love.share.json
 
 object SystemConfig {
@@ -68,22 +64,17 @@ object SystemConfig {
             json.decodeFromString<List<JournalService.JournalBackupInfo>>(it)
         } ?: emptyList()
 
-    private val query: SystemConfigQueries by lazy {
-        val driver = DriverFactory.create().createDriver(SystemConfigDatabaseName)
-        Database(driver).systemConfigQueries
-    }
-
     /**
      * 设置配置
      */
     fun <T> set(key: String, value: T) {
-        query.set(key, value.toString())
+        JournalService.currentQuery.value.set(key, value.toString())
     }
 
     /**
      * 获取配置
      */
     fun get(key: String): String? {
-        return query.get(key).executeAsOneOrNull()?.value_
+        return JournalService.currentQuery.value.get(key).executeAsOneOrNull()?.value_
     }
 }

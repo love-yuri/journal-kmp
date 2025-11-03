@@ -9,6 +9,16 @@ CREATE TABLE Journal (
     weather TEXT -- 天气
 );
 
+CREATE TABLE SystemConfig (
+    key TEXT PRIMARY KEY NOT NULL ,
+    value TEXT
+);
+
+INSERT OR IGNORE INTO SystemConfig (key, value)
+VALUES ('start_time', datetime('now', 'localtime'));
+
+get: SELECT value FROM SystemConfig WHERE key = ?;
+set: INSERT OR REPLACE INTO SystemConfig VALUES (?, ?);
 all: SELECT * FROM Journal;
 getById: SELECT * FROM Journal WHERE id = ?;
 insert: INSERT INTO Journal VALUES ?;

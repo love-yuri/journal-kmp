@@ -138,7 +138,7 @@ object JournalService {
     // 加载指定页数据
     private fun loadPage(page: Long) {
         val offset = page * SIZE
-        val data = _currentQuery.value
+        val data = currentQuery.value
             .page(SIZE, offset)
             .executeAsList()
 
@@ -171,7 +171,7 @@ object JournalService {
      * update journal
      */
     fun update(journal: Journal): Boolean {
-        val res = _currentQuery.value.updateById (
+        val res = currentQuery.value.updateById (
             journal.title,
             journal.content,
             journal.mood,
@@ -191,7 +191,7 @@ object JournalService {
     }
 
     fun insert(journal: Journal): Boolean {
-        val res = _currentQuery.value.insert(journal).value > 0
+        val res = currentQuery.value.insert(journal).value > 0
         if (res) {
             autoBackup()
         } else {
@@ -205,7 +205,7 @@ object JournalService {
     }
 
     fun delete(journal: Journal): Boolean {
-        val res = _currentQuery.value.deleteById(journal.id).value > 0
+        val res = currentQuery.value.deleteById(journal.id).value > 0
         if (res) {
             autoBackup()
         } else {
