@@ -3,9 +3,10 @@ name: KMP 自动构建发布
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'gradle.properties'   # 仅在 gradle.properties 更新时触发
+      - '.github/workflows/*'
 
 jobs:
   build-release:
