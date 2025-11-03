@@ -6,6 +6,10 @@ on:
       - main
     paths:
       - 'gradle.properties'
+      - '.github/workflows/*'
+
+permissions:
+  contents: write
 
 jobs:
   build-and-release:
@@ -21,7 +25,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21' 
+          java-version: '21'
           cache: 'gradle'
 
       - name: Grant execute permission for gradlew
@@ -55,30 +59,15 @@ jobs:
           echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
           echo "apk_name=$(basename $APK_PATH)" >> $GITHUB_OUTPUT
 
-      - name: Create Release
+      - name: Create Release and Upload APK
         if: steps.check_tag.outputs.exists == 'false'
-        id: create_release
-        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          release_name: Release ${{ steps.version.outputs.version }}
-          body: |
-            Auto-generated release for version ${{ steps.version.outputs.version }}
-            
-            ## Changes
-            - Updated gradle.properties
-          draft: false
-          prerelease: false
+        run: |
+          gh release create ${{ steps.version.outputs.tag }} \
+            --title "Release ${{ steps.version.outputs.version }}" \
+            --notes "Auto-generated release for version ${{ steps.version.outputs.version }}
 
-      - name: Upload APK to Release
-        if: steps.check_tag.outputs.exists == 'false'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.find_apk.outputs.apk_path }}
-          asset_name: ${{ steps.find_apk.outputs.apk_name }}
-          asset_content_type: application/vnd.android.package-archive
+          ## Changes
+          - Updated gradle.properties" \
+            ${{ steps.find_apk.outputs.apk_path }}
