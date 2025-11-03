@@ -1,6 +1,7 @@
 # 📔 正经人都不用的日记软件
 
 > 一款基于 Kotlin Multiplatform 构建的跨平台日记应用，专注于提供流畅的书写体验与安全的数据管理
+> 因为没有设备所以暂未支持所有苹果设备，如需ios平台支持请自行添加ios依赖。
 
 <div>
     <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="version"/>
