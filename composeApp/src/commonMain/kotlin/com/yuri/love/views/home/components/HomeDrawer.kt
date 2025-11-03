@@ -294,7 +294,7 @@ private fun EnhancedDrawerHeader(journalInfo: JournalInfo) {
                 val modifier = Modifier.weight(1f)
                 StatCard("总文章", journalInfo.total.toString(), modifier)
                 StatCard("总字数", getTotalWords(journalInfo), modifier)
-                StatCard("总时间", TimeUtils.calculateTimeDifference(SystemConfig.start_time), modifier)
+                StatCard("总天数", TimeUtils.calculateTimeDifference(SystemConfig.start_time), modifier)
             }
         }
     }

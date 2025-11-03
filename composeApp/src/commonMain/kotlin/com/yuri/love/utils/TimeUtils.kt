@@ -11,6 +11,7 @@ import kotlinx.datetime.toLocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -59,6 +60,6 @@ object TimeUtils {
         val nowInstant = now.toInstant(zone)
         val duration: Duration = nowInstant - startInstant
 
-        return "${duration.inWholeDays}天"
+        return "${duration.inWholeDays}"
     }
 }
