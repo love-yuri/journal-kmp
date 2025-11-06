@@ -49,6 +49,13 @@ fun DeleteConfirmDialog(
     )
 }
 
+data class ConfirmDialogInfo(
+    val visible: Boolean,
+    val title: String,
+    val message: String,
+    val action: () -> Unit = {},
+)
+
 /**
  * 再次确认对话框
  */
