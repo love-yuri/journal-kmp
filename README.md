@@ -4,18 +4,10 @@
 > 因为没有设备所以暂未支持所有苹果设备，如需ios平台支持请自行添加ios依赖。
 
 <div>
-    <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="version"/>
+    <img src="https://img.shields.io/badge/version-1.2.0-blue.svg" alt="version"/>
     <img src="https://img.shields.io/badge/Kotlin-2.2.20-purple.svg" alt="kotlin"/>
     <img src="https://img.shields.io/badge/Compose-1.8.2-green.svg" alt="compose"/>
     <img src="https://img.shields.io/badge/license-MIT-orange.svg" alt="license"/>
-</div>
-
----
-
-## 📸 应用预览
-
-<div align="center">
-    <img src="doc/introduce.gif" alt="应用演示" width="300"/>
 </div>
 
 ---
@@ -30,15 +22,42 @@
 
 ---
 
+## 📝 版本历史
+
+### v1.2.0
+- 新增离开页面自动保存/更新功能
+- 新增远程备份与同步功能
+
+### v1.0.0 (2025-11-02)
+
+🎉 首个正式版本发布
+
+**核心功能**
+- 日记的增删改查与统计分析
+- WebDAV 云端备份与恢复
+- 指纹/PIN 码身份验证
+- Material Design 3 界面设计
+- 流畅的动画与交互体验
+
+---
+
+## 📸 应用预览
+
+<div align="center">
+    <img src="doc/introduce.gif" alt="应用演示" width="300"/>
+</div>
+
+---
+
 ## 🛠 核心框架
 
-| 依赖 | 用途 |
-|------|------|
+| 依赖                    | 用途        |
+|-----------------------|-----------|
 | Compose Multiplatform | 跨平台 UI 框架 |
-| Voyager | 导航管理 |
-| SQLDelight | 数据库 ORM |
-| Retrofit | 网络请求 |
-| AndroidX Biometric | 生物识别认证 |
+| Voyager               | 导航管理      |
+| SQLDelight            | 数据库 ORM   |
+| Retrofit              | 网络请求      |
+| AndroidX Biometric    | 生物识别认证    |
 
 ---
 
@@ -78,21 +97,6 @@ Journal/
 ├── settings.gradle.kts
 └── README.md
 ```
-
----
-
-## 📝 版本历史
-
-### v1.0.0 (2025-11-02)
-
-🎉 首个正式版本发布
-
-**核心功能**
-- 日记的增删改查与统计分析
-- WebDAV 云端备份与恢复
-- 指纹/PIN 码身份验证
-- Material Design 3 界面设计
-- 流畅的动画与交互体验
 
 ---
 
