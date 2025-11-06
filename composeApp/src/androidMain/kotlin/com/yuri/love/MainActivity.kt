@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -23,13 +21,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
+import cafe.adriel.voyager.core.registry.ScreenRegistry
 import com.yuri.love.database.SystemConfig
+import com.yuri.love.share.NavigatorManager.featurePostsScreenModule
 import com.yuri.love.utils.BiometricAuth
 
 @OptIn(ExperimentalMultiplatform::class)
 actual object Static {
     actual fun init() {
         System.setProperty("kotlin-logging-to-android-native", "true")
+        ScreenRegistry {
+            featurePostsScreenModule()
+        }
     }
 }
 
