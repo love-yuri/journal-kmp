@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.yuri.love.Journal
@@ -60,10 +62,9 @@ class CreateScreen(val journal: Journal? = null): Screen {
     @Suppress("AutoboxingStateCreation")
     @Preview
     @Composable
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class, ExperimentalVoyagerApi::class)
     override fun Content() {
         val navigator = LocalNavigator.current
-
         var title by remember { mutableStateOf(journal?.title ?: "")  }
         var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
         var textFieldValue by remember { mutableStateOf(TextFieldValue(journal?.content ?: "")) }
@@ -80,6 +81,21 @@ class CreateScreen(val journal: Journal? = null): Screen {
         val imeInsets = WindowInsets.ime
         val imeBottom = with(LocalDensity.current) {
             imeInsets.getBottom(this).toDp()
+        }
+
+
+        LifecycleEffectOnce {
+            onDispose {
+                try {
+                    if (isUpdate) {
+                        updateJournal(journal, title, textFieldValue.text)
+                    } else {
+                        addJournal(title, textFieldValue.text)
+                    }
+                } catch (e: Exception) {
+                    Notification.notificationState?.error("操作失败 -> ${e.message}")
+                }
+            }
         }
 
         LaunchedEffect(targetScrollValue) {
@@ -384,6 +400,10 @@ fun ToolbarWithIme(content: String) {
 }
 
 private fun addJournal(title: String?, content: String) {
+    if (title?.isBlank() ?: true && content.isBlank()) {
+        return
+    }
+
     val journal = Journal(
         id = SnowFlake.nextId(),
         title = title?.ifEmpty { null },
@@ -402,10 +422,15 @@ private fun addJournal(title: String?, content: String) {
 
 private fun updateJournal(journal: Journal?, title: String?, content: String) {
     journal ?: throw RuntimeException("journal is null, update error!")
+    if (content.trim() == journal.content.trim() && title?.trim() == journal.title?.trim()) {
+        return
+    }
+
     val res = JournalService.update (journal.copy(
         title = title?.ifEmpty { null },
         content = content,
     ))
+
     if (res) {
         Notification.notificationState?.success("更新成功")
         return
