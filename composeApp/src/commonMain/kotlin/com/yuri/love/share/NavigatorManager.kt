@@ -61,7 +61,7 @@ object NavigatorManager {
         EnhancedDrawerMenuItem(ScreenPageType.Home,"所有日记", Icons.Outlined.Home),
         EnhancedDrawerMenuItem(ScreenPageType.Webdav,"Webdav网盘", Icons.Outlined.Explore),
         EnhancedDrawerMenuItem(ScreenPageType.Backup, "备份和恢复", Icons.Outlined.Backup),
-        EnhancedDrawerMenuItem(ScreenPageType.Test, "测试页面", Icons.Outlined.Yard),
+//        EnhancedDrawerMenuItem(ScreenPageType.Test, "测试页面", Icons.Outlined.Yard),
         EnhancedDrawerMenuItem(ScreenPageType.Setting, "系统设置", Icons.Outlined.Settings)
     )
 

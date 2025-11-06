@@ -211,7 +211,7 @@ fun JournalCardComposable(
 
                     // 时间
                     Text(
-                        text = formatTimestampTime(journal.createdAt),
+                        text = formatTimestampTime(journal.updatedAt),
                         fontSize = 12.sp,
                         color = Color(0xFF9CA3AF),
                         fontWeight = FontWeight.Medium,
