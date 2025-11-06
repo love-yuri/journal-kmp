@@ -1,52 +1,44 @@
 package com.yuri.love.views.home.components
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
 import com.yuri.love.JournalInfo
 import com.yuri.love.database.JournalService
 import com.yuri.love.database.SystemConfig
-import com.yuri.love.database.SystemConfig.get
-import com.yuri.love.share.AppName
-import com.yuri.love.share.AppVersion
-import com.yuri.love.share.GlobalStyle
-import com.yuri.love.share.GlobalValue
-import com.yuri.love.share.NavigatorManager
+import com.yuri.love.share.*
 import com.yuri.love.share.NavigatorManager.drawerItems
 import com.yuri.love.utils.TimeUtils
 import com.yuri.love.utils.platformSafeTopPadding
-import com.yuri.love.views.home.HomeScreen
-import com.yuri.love.views.test.TestScreen
-import com.yuri.love.views.webdav.WebdavScreen
-import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import journal.composeapp.generated.resources.Res
 import journal.composeapp.generated.resources.avatar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import nl.adaptivity.xmlutil.core.impl.multiplatform.name
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.painterResource
-import kotlin.reflect.KClass
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 val LocalDrawerController = staticCompositionLocalOf<DrawerController> {
     error("No DrawerController provided")
@@ -63,7 +55,6 @@ class DrawerController(
 @Preview
 @Composable
 fun HomeDrawer(onCloseDrawer: () -> Unit = {}) {
-    val currentPageType by NavigatorManager.currentPageType.collectAsState()
     val journalInfo = JournalService.JournalInfo.collectAsState()
 
     Box(
@@ -113,8 +104,7 @@ fun HomeDrawer(onCloseDrawer: () -> Unit = {}) {
                         onClick = {
                             GlobalValue.navigatorManager.push(item.key)
                             onCloseDrawer()
-                        },
-                        currentPageType
+                        }
                     )
                 }
             }
@@ -335,11 +325,9 @@ private fun StatCard(label: String, value: String, modifier: Modifier = Modifier
 @Composable
 private fun EnhancedDrawerItem(
     item: NavigatorManager.EnhancedDrawerMenuItem,
-    onClick: () -> Unit,
-    currentPageType: NavigatorManager.ScreenPageType
-) {
-
-    val isSelected = currentPageType == item.key
+    onClick: () -> Unit)
+{
+    val isSelected = NavigatorManager.currentPageType == item.key
 
     Surface(
         onClick = onClick,

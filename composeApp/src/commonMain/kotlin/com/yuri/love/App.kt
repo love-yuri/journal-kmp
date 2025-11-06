@@ -10,6 +10,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.registry.rememberScreen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.yuri.love.retrofit.initCurrentWeather
@@ -34,6 +35,7 @@ fun App() {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val drawerController = remember { DrawerController(drawerState, scope) }
+    val home = rememberScreen(GlobalValue.navigatorManager.defaultPageType)
     CompositionLocalProvider(LocalDrawerController provides drawerController) {
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -52,10 +54,9 @@ fun App() {
                             .background(GlobalStyle.softPinkGradient)
                     ) {
                         Navigator(
-                            screen = GlobalValue.navigatorManager.defaultScreen,
+                            screen = home,
                             onBackPressed = {
-                                GlobalValue.navigatorManager.pop()
-                                false
+                                return@Navigator GlobalValue.navigatorManager.pop()
                             }
                         ) { navigator ->
                             GlobalValue.navigatorManager.init(navigator)
