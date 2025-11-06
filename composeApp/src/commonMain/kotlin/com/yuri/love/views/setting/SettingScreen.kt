@@ -20,19 +20,22 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.registry.rememberScreen
 import cafe.adriel.voyager.core.screen.Screen
 import com.yuri.love.components.SimpleTopBar
+import com.yuri.love.database.JournalService
 import com.yuri.love.database.SystemConfig
 import com.yuri.love.share.AppVersion
 import com.yuri.love.share.GlobalStyle
-import com.yuri.love.share.GlobalValue
-import com.yuri.love.share.NavigatorManager
-import com.yuri.love.share.NavigatorManager.ScreenPageType
-import com.yuri.love.utils.PlatformUtils
 import com.yuri.love.utils.notification.Notification
+import com.yuri.love.components.ConfirmDialogInfo
 
 class SettingScreen : Screen {
+    var confirmDialogInfo by mutableStateOf<ConfirmDialogInfo>(ConfirmDialogInfo(
+        visible = false,
+        title = "",
+        message = ""
+    ))
+
     @Composable
     override fun Content() {
         var fingerprintEnabled by remember { mutableStateOf(SystemConfig.FingerprintEnabled) }
@@ -40,6 +43,8 @@ class SettingScreen : Screen {
         var autoBackupEnabled by remember { mutableStateOf(SystemConfig.AutoBackup) }
         var notificationEnabled by remember { mutableStateOf(true) }
         var darkModeEnabled by remember { mutableStateOf(false) }
+
+        ConfirmDialog()
 
         Column(
             modifier = Modifier
@@ -113,20 +118,37 @@ class SettingScreen : Screen {
 
                     SettingItemButton(
                         icon = Icons.Default.Backup,
-                        title = "立即备份",
-                        subtitle = "手动备份当前数据",
+                        title = "立即备份到远程",
+                        subtitle = "手动备份当前数据到远程服务器",
                     ) {
-                        GlobalValue.navigatorManager.push(ScreenPageType.Backup)
+                        confirmDialogInfo = ConfirmDialogInfo(
+                            visible = true,
+                            title = "是否立即备份",
+                            message = "备份将会替换远程已有数据!"
+                        ) {
+                            if (!SystemConfig.isLoggedIn) {
+                                Notification.notificationState?.error("请先登录!")
+                                return@ConfirmDialogInfo
+                            }
+                            JournalService.autoBackup()
+                            Notification.notificationState?.success("已同步到远程")
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
                     SettingItemButton(
                         icon = Icons.Default.Restore,
-                        title = "恢复数据",
-                        subtitle = "从备份恢复数据"
+                        title = "立即同步远程备份",
+                        subtitle = "从远程服务器同步备份数据"
                     ) {
-                        GlobalValue.navigatorManager.push(ScreenPageType.Backup)
+                        confirmDialogInfo = ConfirmDialogInfo(
+                            visible = true,
+                            title = "是否立即同步",
+                            message = "同步将会覆盖本地已有数据!"
+                        ) {
+                            JournalService.restoreFromAutoBackup()
+                        }
                     }
                 }
 
@@ -172,6 +194,24 @@ class SettingScreen : Screen {
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
+    }
+
+
+    @Composable
+    private fun ConfirmDialog() {
+        com.yuri.love.components.ConfirmDialog(
+            visible = confirmDialogInfo.visible,
+            title = confirmDialogInfo.title,
+            message = confirmDialogInfo.message,
+            onConfirm = confirmDialogInfo.action,
+            cancelText = "取消",
+            confirmColor = Color(0xFF388E3C),
+            onDismiss = {
+                confirmDialogInfo = confirmDialogInfo.copy(
+                    visible = false
+                )
+            }
+        )
     }
 }
 

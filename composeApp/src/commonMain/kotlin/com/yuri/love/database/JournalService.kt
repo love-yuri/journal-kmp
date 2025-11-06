@@ -33,8 +33,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.io.File
 
-val log = logger {}
-
 /**
  * sql服务
  */
@@ -119,7 +117,7 @@ object JournalService {
     /**
      * 自动备份
      */
-    private fun autoBackup() {
+    fun autoBackup() {
         scope.launch {
             if (!SystemConfig.AutoBackup || !SystemConfig.isLoggedIn) {
                 return@launch
@@ -280,6 +278,25 @@ object JournalService {
     }
 
     /**
+     * 从webdav自动恢复
+     */
+    fun restoreFromAutoBackup() {
+        if (!SystemConfig.isLoggedIn) {
+            Notification.notificationState?.error("请先登录!")
+            return
+        }
+        scope.launch {
+            val tempFile = File.createTempFile(TempRestoreFilePrefix, TempRestoreFileSuffix)
+            if (!WebDavService.download(AutoBackupFileName, tempFile)) {
+                Notification.notificationState?.error("远程备份文件不存在!!")
+                return@launch
+            }
+            restoreFromFile(tempFile)
+            Notification.notificationState?.success("同步远程备份成功!!")
+        }
+    }
+
+    /**
      * 从本地恢复
      * @param info 备份信息
      */
@@ -326,7 +343,7 @@ object JournalService {
                 }
                 restoreFromFile(tempFile)
             } catch (e: Exception) {
-                log.error { "恢复失败: ${e.message}" }
+                logger { }.error { "恢复失败: ${e.message}" }
                 Notification.notificationState?.error("恢复失败: ${e.message}")
             }
         }
@@ -344,7 +361,7 @@ object JournalService {
             }
             Notification.notificationState?.success("恢复成功!!")
         } catch (e: Exception) {
-            log.error { "恢复失败!! ${e.message}" }
+            logger { }.error { "恢复失败!! ${e.message}" }
             Notification.notificationState?.error("恢复失败!! ${e.message}")
         }
     }
@@ -366,7 +383,7 @@ object JournalService {
             SystemConfig.journal_backups = list
             Notification.notificationState?.success("${info.name} 删除成功!!")
         } catch (ex: Exception) {
-            log.info { "删除备份失败: ${info.name} msg: ${ex.message}" }
+            logger { }.info { "删除备份失败: ${info.name} msg: ${ex.message}" }
             Notification.notificationState?.error("${info.name} 删除失败: ${ex.message}")
         }
     }
