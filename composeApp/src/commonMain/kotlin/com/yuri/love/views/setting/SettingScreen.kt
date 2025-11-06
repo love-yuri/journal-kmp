@@ -20,12 +20,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.registry.rememberScreen
 import cafe.adriel.voyager.core.screen.Screen
 import com.yuri.love.components.SimpleTopBar
 import com.yuri.love.database.SystemConfig
 import com.yuri.love.share.AppVersion
 import com.yuri.love.share.GlobalStyle
 import com.yuri.love.share.GlobalValue
+import com.yuri.love.share.NavigatorManager
 import com.yuri.love.share.NavigatorManager.ScreenPageType
 import com.yuri.love.utils.PlatformUtils
 import com.yuri.love.utils.notification.Notification
