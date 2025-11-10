@@ -108,7 +108,6 @@ fun JournalCardComposable(
                             navigator?.push(CreateScreen(journal))
                         },
                         onLongPress = {
-                            logger {}.info { "长按: ${journal.title}" }
                             onDelete?.invoke(journal)
                         }
                     )

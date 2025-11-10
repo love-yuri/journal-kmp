@@ -156,18 +156,7 @@ class CreateScreen(val journal: Journal? = null): Screen {
 
                     ModernIconButton(
                         icon = Icons.Default.Check,
-                        onClick = {
-                            try {
-                                if (isUpdate) {
-                                    updateJournal(journal, title, textFieldValue.text)
-                                } else {
-                                    addJournal(title, textFieldValue.text)
-                                }
-                                navigator?.pop()
-                            } catch (e: Exception) {
-                                Notification.notificationState?.error("操作失败 -> ${e.message}")
-                            }
-                        },
+                        onClick = { navigator?.pop() },
                         contentDescription = "确认",
                         tint = primaryColor
                     )
